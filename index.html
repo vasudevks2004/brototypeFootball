@@ -2527,43 +2527,53 @@
     function checkSupabaseStatus() {
       fetch('/api/db-status')
         .then(res => res.json())
-        .then(info => {
-          const dot = document.getElementById('supabase-status-dot');
-          const text = document.getElementById('supabase-status-text');
-          const indicator = document.getElementById('supabase-status-indicator');
-          
-          if (info.connected) {
-            if (dot) dot.style.backgroundColor = '#10b981'; // vibrant green
-            if (text) text.innerText = 'Supabase Active';
-            if (indicator) {
-              indicator.title = "Directly connected to cloud central database node. Click for details.";
-            }
-          } else {
-            if (dot) dot.style.backgroundColor = '#ef4444'; // safety crimson
-            if (text) text.innerText = info.status === 'Schema Missing' ? 'DB Missing Schema' : 'DB Fallback Mode';
-            if (indicator) {
-              animationWobble(indicator);
-              indicator.title = info.message + " Click to initialize schema.";
-            }
-          }
-        })
+        .then(info => applySupabaseStatus(info))
         .catch(err => {
-          console.warn("Unable to fetch backend database status state.", err);
+          // Express unavailable (Vercel) — check Supabase directly
+          directSupabaseStatusCheck()
+            .then(info => applySupabaseStatus(info))
+            .catch(() => {
+              applySupabaseStatus({ connected: false, status: 'Offline', message: 'Cannot reach database.' });
+            });
         });
     }
 
-    function animationWobble(el) {
-      if (!el) return;
-      el.style.transition = 'transform 0.1s';
-      let i = 0;
-      const t = setInterval(() => {
-        el.style.transform = i % 2 === 0 ? 'translateX(2px)' : 'translateX(-2px)';
-        i++;
-        if (i > 6) {
-          clearInterval(t);
-          el.style.transform = 'none';
+    async function directSupabaseStatusCheck() {
+      try {
+        const url = `${SUPABASE_URL}/rest/v1/tournament_store?key=eq.default&select=data`;
+        const res = await fetch(url, {
+          headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`
+          }
+        });
+        if (res.ok) {
+          return { connected: true, status: "Fully Connected", message: "Connected directly to Supabase cloud database.", table: "tournament_store" };
+        } else {
+          return { connected: false, status: "Schema Missing", message: "Supabase reachable but table may not exist." };
         }
-      }, 80);
+      } catch (err) {
+        return { connected: false, status: "Offline", message: "Cannot reach Supabase endpoint." };
+      }
+    }
+
+    function applySupabaseStatus(info) {
+      const dot = document.getElementById('supabase-status-dot');
+      const text = document.getElementById('supabase-status-text');
+      const indicator = document.getElementById('supabase-status-indicator');
+      
+      if (info.connected) {
+        if (dot) dot.style.backgroundColor = '#10b981';
+        if (text) text.innerText = 'Supabase Active';
+        if (indicator) indicator.title = "Directly connected to cloud central database node. Click for details.";
+      } else {
+        if (dot) dot.style.backgroundColor = '#ef4444';
+        if (text) text.innerText = info.status === 'Schema Missing' ? 'DB Missing Schema' : 'DB Fallback Mode';
+        if (indicator) {
+          animationWobble(indicator);
+          indicator.title = info.message + " Click to initialize schema.";
+        }
+      }
     }
 
     function openSupabaseDialog() {
@@ -2571,11 +2581,11 @@
         .then(res => res.json())
         .then(info => showSupabaseDetails(info))
         .catch(err => {
-          showSupabaseDetails({
-            connected: false,
-            status: "Offline",
-            message: "Unable to reach verification status from Express proxy server: " + err.message
-          });
+          directSupabaseStatusCheck()
+            .then(info => showSupabaseDetails(info))
+            .catch(() => {
+              showSupabaseDetails({ connected: false, status: "Offline", message: "Unable to reach any database endpoint." });
+            });
         });
     }
 
@@ -2626,87 +2636,153 @@
       }, 3000);
     });
 
-    // LOAD & SAVE DATABASE UTILITIES
+    // SUPABASE DIRECT CONFIG (used when Express server is unavailable, e.g. on Vercel)
+    const SUPABASE_URL = "https://vjtirydmavuknpruxutq.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdGlyeWRtYXZ1a25wcnV4dXRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1NTk2MDMsImV4cCI6MjA5NzEzNTYwM30.r47gybToBIdfHWfrcmqpZVHMQdSR4IgAXhiG1gWG8QM";
+
+    // Direct Supabase fetch (client-side fallback)
+    async function supabaseLoadData() {
+      const url = `${SUPABASE_URL}/rest/v1/tournament_store?key=eq.default&select=data`;
+      const res = await fetch(url, {
+        method: "GET",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`,
+          "Content-Type": "application/json"
+        }
+      });
+      if (res.ok) {
+        const rows = await res.json();
+        if (rows && rows.length > 0 && rows[0].data) {
+          return rows[0].data;
+        }
+      }
+      return null;
+    }
+
+    // Direct Supabase save (client-side fallback)
+    async function supabaseSaveData(data) {
+      const url = `${SUPABASE_URL}/rest/v1/tournament_store`;
+      // Try upsert first
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`,
+          "Content-Type": "application/json",
+          "Prefer": "resolution=merge-duplicates"
+        },
+        body: JSON.stringify({ key: "default", data: data })
+      });
+      if (res.ok) return true;
+
+      // Fallback to PATCH
+      const patchUrl = `${SUPABASE_URL}/rest/v1/tournament_store?key=eq.default`;
+      const patchRes = await fetch(patchUrl, {
+        method: "PATCH",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`,
+          "Content-Type": "application/json",
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify({ data: data })
+      });
+      return patchRes.ok;
+    }
+
     function loadDatabase(isPeriodic = false) {
+      // Try Express server first (local dev), fall back to direct Supabase (Vercel)
       fetch('/api/data')
         .then(res => {
           if (!res.ok) throw new Error("HTTP error " + res.status);
           return res.json();
         })
         .then(data => {
-          let newData = data && Array.isArray(data.teams) ? data : defaultData;
-          newData.fixtures = newData.fixtures || [];
-          newData.scorers = newData.scorers || [];
-          newData.standings = newData.standings || [];
-          
-          // Check if data actually changed to avoid redundant layout updates
-          const dataChanged = JSON.stringify(tournamentData) !== JSON.stringify(newData);
-          if (dataChanged) {
-            tournamentData = newData;
-            
-            // Re-render user views
-            renderTeamsView();
-            renderStandingsView();
-            renderScorersView();
-            renderFixturesView();
-            
-            // Re-render admin controls ONLY if no active edit fields are being typed
-            const isEditingTeam = document.getElementById('edit-team-id') && document.getElementById('edit-team-id').value !== '';
-            const isEditingScorer = document.getElementById('edit-scorer-index') && document.getElementById('edit-scorer-index').value !== '';
-            const isEditingFixture = document.getElementById('edit-fixture-id') && document.getElementById('edit-fixture-id').value !== '';
-            
-            if (!isEditingTeam && !isEditingScorer && !isEditingFixture) {
-              renderAdminTeams();
-              renderAdminStandings();
-              renderAdminScorers();
-              renderAdminFixtures();
-            }
-          }
-          
-          // Sync tournament header elements
-          const displayTitle = document.getElementById('display-tournament-title');
-          if (displayTitle) {
-            displayTitle.innerText = tournamentData.tournamentName;
-          }
-          
-          const teamCount = tournamentData.teams ? tournamentData.teams.length : 0;
-          const matchCount = tournamentData.standings ? tournamentData.standings.reduce((sum, s) => sum + s.won + s.lost + s.drawn, 0) / 2 : 0;
-          const subtitle = document.getElementById('display-tournament-subtitle');
-          if (subtitle) {
-            subtitle.innerText = `${teamCount} Teams · ${Math.round(matchCount)} Matches Played · 1 Champion`;
-          }
+          applyLoadedData(data);
         })
         .catch(e => {
-          console.warn("Unable to fetch backend database, falling back to local simulation.", e);
-          if (!isPeriodic) {
-            const stored = localStorage.getItem("btototype_cup_db");
-            if (stored) {
-              try {
-                tournamentData = JSON.parse(stored);
-              } catch (err) {
-                tournamentData = { ...defaultData };
+          console.warn("Express server unavailable, trying direct Supabase...", e.message);
+          // Direct Supabase fallback
+          supabaseLoadData()
+            .then(data => {
+              if (data) {
+                applyLoadedData(data);
+              } else if (!isPeriodic) {
+                // Final fallback: localStorage
+                const stored = localStorage.getItem("btototype_cup_db");
+                if (stored) {
+                  try { tournamentData = JSON.parse(stored); } catch (err) { tournamentData = { ...defaultData }; }
+                } else {
+                  tournamentData = { ...defaultData };
+                }
+                tournamentData.fixtures = tournamentData.fixtures || [];
+                tournamentData.scorers = tournamentData.scorers || [];
+                tournamentData.standings = tournamentData.standings || [];
+                renderAllViews();
               }
-            } else {
-              tournamentData = { ...defaultData };
-            }
-            tournamentData.fixtures = tournamentData.fixtures || [];
-            tournamentData.scorers = tournamentData.scorers || [];
-            tournamentData.standings = tournamentData.standings || [];
-            renderAllViews();
-          }
+            })
+            .catch(sbErr => {
+              console.warn("Supabase direct load also failed:", sbErr.message);
+              if (!isPeriodic) {
+                const stored = localStorage.getItem("btototype_cup_db");
+                if (stored) {
+                  try { tournamentData = JSON.parse(stored); } catch (err) { tournamentData = { ...defaultData }; }
+                } else {
+                  tournamentData = { ...defaultData };
+                }
+                tournamentData.fixtures = tournamentData.fixtures || [];
+                tournamentData.scorers = tournamentData.scorers || [];
+                tournamentData.standings = tournamentData.standings || [];
+                renderAllViews();
+              }
+            });
         });
     }
 
+    function applyLoadedData(data) {
+      let newData = data && Array.isArray(data.teams) ? data : defaultData;
+      newData.fixtures = newData.fixtures || [];
+      newData.scorers = newData.scorers || [];
+      newData.standings = newData.standings || [];
+      
+      const dataChanged = JSON.stringify(tournamentData) !== JSON.stringify(newData);
+      if (dataChanged) {
+        tournamentData = newData;
+        renderTeamsView();
+        renderStandingsView();
+        renderScorersView();
+        renderFixturesView();
+        
+        const isEditingTeam = document.getElementById('edit-team-id') && document.getElementById('edit-team-id').value !== '';
+        const isEditingScorer = document.getElementById('edit-scorer-index') && document.getElementById('edit-scorer-index').value !== '';
+        const isEditingFixture = document.getElementById('edit-fixture-id') && document.getElementById('edit-fixture-id').value !== '';
+        
+        if (!isEditingTeam && !isEditingScorer && !isEditingFixture) {
+          renderAdminTeams();
+          renderAdminStandings();
+          renderAdminScorers();
+          renderAdminFixtures();
+        }
+      }
+      
+      const displayTitle = document.getElementById('display-tournament-title');
+      if (displayTitle) displayTitle.innerText = tournamentData.tournamentName;
+      
+      const teamCount = tournamentData.teams ? tournamentData.teams.length : 0;
+      const matchCount = tournamentData.standings ? tournamentData.standings.reduce((sum, s) => sum + s.won + s.lost + s.drawn, 0) / 2 : 0;
+      const subtitle = document.getElementById('display-tournament-subtitle');
+      if (subtitle) subtitle.innerText = `${teamCount} Teams · ${Math.round(matchCount)} Matches Played · 1 Champion`;
+    }
+
     function saveDatabase() {
-      // Immediate fallback persistence locally
+      // Immediate localStorage fallback
       localStorage.setItem("btototype_cup_db", JSON.stringify(tournamentData));
       
-      // Post database payload back to standard Express endpoint
+      // Try Express server first
       fetch('/api/data', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(tournamentData)
       })
       .then(res => {
@@ -2714,19 +2790,32 @@
         return res.json();
       })
       .then(() => {
-        console.log("Database successfully published to shared cloud node.");
-        
-        // Sync dynamic subtitle stats
-        const teamCount = tournamentData.teams ? tournamentData.teams.length : 0;
-        const matchCount = tournamentData.standings ? tournamentData.standings.reduce((sum, s) => sum + s.won + s.lost + s.drawn, 0) / 2 : 0;
-        const subtitle = document.getElementById('display-tournament-subtitle');
-        if (subtitle) {
-          subtitle.innerText = `${teamCount} Teams · ${Math.round(matchCount)} Matches Played · 1 Champion`;
-        }
+        console.log("Database successfully published to shared cloud node via Express.");
+        updateSubtitleStats();
       })
       .catch(err => {
-        console.error("Cloud synchronization mismatch error:", err);
+        console.warn("Express save failed, trying direct Supabase...", err.message);
+        // Direct Supabase fallback
+        supabaseSaveData(tournamentData)
+          .then(ok => {
+            if (ok) {
+              console.log("Database successfully published to Supabase directly.");
+            } else {
+              console.error("Direct Supabase save also failed.");
+            }
+            updateSubtitleStats();
+          })
+          .catch(sbErr => {
+            console.error("All cloud sync attempts failed:", sbErr.message);
+          });
       });
+    }
+
+    function updateSubtitleStats() {
+      const teamCount = tournamentData.teams ? tournamentData.teams.length : 0;
+      const matchCount = tournamentData.standings ? tournamentData.standings.reduce((sum, s) => sum + s.won + s.lost + s.drawn, 0) / 2 : 0;
+      const subtitle = document.getElementById('display-tournament-subtitle');
+      if (subtitle) subtitle.innerText = `${teamCount} Teams · ${Math.round(matchCount)} Matches Played · 1 Champion`;
     }
 
     function syncCustomFlagInput() {
