@@ -1,0 +1,3897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bro Tournament</title>
+  <style>
+    /* IMPORT GOOGLE FONTS */
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
+
+    /* CUSTOM PROPERTIES — BOLD TYPOGRAPHY STYLING */
+    :root {
+      --primary: #0a5c36;
+      --primary-light: #127546;
+      --primary-dark: #05331e;
+      --secondary: #1a7a4a;
+      --accent: #ca8a04;
+      --accent-light: #fde047;
+      --accent-dark: #713f12;
+      --bg: #f5f5f4;
+      --card-bg: #ffffff;
+      --text-main: #000000;
+      --text-muted: #3f3f46;
+      --text-secondary: #18181b;
+      --white: #ffffff;
+      --border-color: #000000;
+      --border-width: 3px;
+      --radius: 4px;
+      --shadow-sm: 3px 3px 0px 0px #000000;
+      --shadow: 6px 6px 0px 0px #000000;
+      --shadow-lg: 8px 8px 0px 0px #000000;
+      --font-sans: 'Space Grotesk', -apple-system, system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --admin: #581c87;
+      --admin-light: #7e22ce;
+      --admin-dark: #1e0b30;
+      --danger: #e11d48;
+      --danger-light: #fecdd3;
+      --success: #15803d;
+      --success-light: #bbf7d0;
+    }
+
+    /* BASE RESET & STYLES */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      line-height: 1.4;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    button, input, select {
+      font-family: inherit;
+      font-size: inherit;
+      outline: none;
+    }
+
+    /* CONTAINER */
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* HEADER & STICKY NAVIGATION */
+    header {
+      background-color: var(--primary);
+      border-bottom: var(--border-width) solid #000000;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 76px;
+    }
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 900;
+      font-size: 22px;
+      color: #ffffff;
+      letter-spacing: -1px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .logo-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background-color: #000000;
+      color: var(--white);
+      border: 2.5px solid #000000;
+      border-radius: 50%;
+      font-size: 20px;
+      box-shadow: 2px 2px 0px var(--accent-light);
+    }
+    .desktop-nav {
+      display: flex;
+      gap: 12px;
+      margin-left: auto;
+    }
+    .nav-btn {
+      padding: 10px 18px;
+      border-radius: var(--radius);
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 800;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: 2px solid transparent;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .nav-btn:hover {
+      color: #000000;
+      background-color: var(--accent-light);
+      border-color: #000000;
+      transform: translateY(-2px);
+    }
+    .nav-btn.active {
+      color: #000000;
+      background-color: var(--white);
+      border-color: #000000;
+      box-shadow: var(--shadow-sm);
+    }
+    .theme-toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+      margin-left: 20px;
+    }
+    @media (max-width: 768px) {
+      .theme-toggle-wrap {
+        margin-left: auto;
+        margin-right: 15px;
+      }
+    }
+
+    /* MOBILE MENU TOGGLE */
+    .mobile-menu-btn {
+      display: none;
+      background: var(--white);
+      border: 2px solid #000000;
+      border-radius: var(--radius);
+      font-size: 24px;
+      color: #000000;
+      cursor: pointer;
+      padding: 4px 10px;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.1s;
+    }
+    .mobile-menu-btn:active {
+      transform: translate(1px, 1px);
+    }
+    .mobile-nav-dropdown {
+      display: none;
+      background-color: var(--primary-dark);
+      border-bottom: var(--border-width) solid #000000;
+      position: absolute;
+      top: 76px;
+      left: 0;
+      right: 0;
+      z-index: 39;
+    }
+    .mobile-nav-dropdown.open {
+      display: flex;
+      flex-direction: column;
+      padding: 16px 24px;
+      gap: 10px;
+    }
+    .mobile-nav-dropdown .nav-btn {
+      text-align: left;
+      width: 100%;
+      padding: 12px 16px;
+      background-color: rgba(0,0,0,0.2);
+    }
+    .mobile-nav-dropdown .nav-btn:hover {
+      background-color: var(--accent-light);
+    }
+    .mobile-nav-dropdown .nav-btn.active {
+      background-color: var(--white);
+      color: #000000;
+    }
+
+    /* MAIN CONTENT & PAGES */
+    main {
+      flex: 1;
+      position: relative;
+    }
+
+    /* PAGE SHADOW / FADE IMPLEMENTATION */
+    .page-section {
+      display: none;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      padding: 48px 0 80px 0;
+    }
+    .page-section.active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* HERO SECTION */
+    .hero-container {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      position: relative;
+      overflow: hidden;
+      color: white;
+      text-align: center;
+      padding: 110px 24px;
+      border: var(--border-width) solid #000000;
+      border-radius: 12px;
+      box-shadow: var(--shadow-lg);
+      margin-top: -1px;
+    }
+    /* Pitch Markings simulation */
+    .hero-container::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 320px;
+      height: 320px;
+      border: 3px solid rgba(255, 255, 255, 0.12);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .hero-container::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 3px;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.08);
+      pointer-events: none;
+    }
+    .hero-pitch-penalty {
+      position: absolute;
+      bottom: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 500px;
+      height: 150px;
+      border: 3px solid rgba(255,255,255,0.1);
+      pointer-events: none;
+      border-radius: 12px;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    .badge-premium {
+      display: inline-flex;
+      align-items: center;
+      background: var(--accent-light);
+      border: 2.5px solid #000000;
+      color: #000000;
+      padding: 8px 20px;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow-sm);
+    }
+    .hero-title {
+      font-size: 60px;
+      font-weight: 900;
+      line-height: 1.05;
+      margin-bottom: 20px;
+      letter-spacing: -2px;
+      text-transform: uppercase;
+      text-shadow: 3px 3px 0px #000000;
+    }
+    .hero-subtitle {
+      font-size: 22px;
+      color: rgba(255, 255, 255, 0.95);
+      margin-bottom: 36px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      font-family: var(--font-mono);
+    }
+    .hero-cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background-color: var(--white);
+      color: #000000;
+      padding: 16px 36px;
+      border-radius: 4px;
+      font-weight: 900;
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: var(--border-width) solid #000000;
+      cursor: pointer;
+      box-shadow: 4px 4px 0px #000000;
+      transition: all 0.1s ease;
+    }
+    .hero-cta-btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0px #000000;
+      background-color: var(--accent-light);
+    }
+    .hero-cta-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0px #000000;
+    }
+
+    /* GENERAL PAGE TYPOGRAPHY */
+    .section-header {
+      margin-bottom: 48px;
+      text-align: center;
+    }
+    .section-title {
+      font-size: 44px;
+      font-weight: 900;
+      color: var(--text-main);
+      letter-spacing: -1.75px;
+      text-transform: uppercase;
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+    .section-desc {
+      font-size: 18px;
+      color: var(--text-muted);
+      font-weight: 600;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* CARD GRID FOR TEAMS */
+    .teams-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      margin-bottom: 48px;
+    }
+    .team-card {
+      background-color: var(--card-bg);
+      border-radius: 4px;
+      padding: 32px 24px;
+      border: var(--border-width) solid #000000;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .team-card:hover {
+      transform: translate(-4px, -4px);
+      box-shadow: 10px 10px 0px 0px #000000;
+      border-color: var(--primary);
+    }
+    .team-card:active {
+      transform: translate(2px, 2px);
+      box-shadow: 3px 3px 0px 0px #000000;
+    }
+    .team-badge-circle {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 950;
+      color: white;
+      margin-bottom: 20px;
+      box-shadow: 3px 3px 0px #000000;
+      border: var(--border-width) solid #000000;
+      overflow: hidden;
+    }
+    .team-card-name {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      color: var(--text-main);
+    }
+    .team-card-meta {
+      font-size: 15px;
+      color: var(--text-muted);
+      font-weight: 700;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+    }
+
+    /* DETAIL VIEW (PLAYERS LISTS) */
+    .detail-container {
+      background-color: var(--card-bg);
+      border-radius: 4px;
+      border: var(--border-width) solid #000000;
+      box-shadow: var(--shadow-lg);
+      padding: 36px;
+      max-width: 650px;
+      margin: 0 auto;
+      opacity: 0;
+      transform: translateY(20px);
+      display: none;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .detail-container.show {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .detail-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: var(--border-width) solid #000000;
+      padding-bottom: 20px;
+      margin-bottom: 28px;
+    }
+    .detail-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .detail-badge-mini {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 900;
+      font-size: 18px;
+      border: 2.5px solid #000000;
+      box-shadow: 2px 2px 0px #000000;
+      overflow: hidden;
+    }
+    .detail-title {
+      font-size: 24px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
+    }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background-color: #ededed;
+      color: #000000;
+      padding: 10px 18px;
+      border-radius: 4px;
+      border: var(--border-width) solid #000000;
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: 13px;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.1s;
+    }
+    .back-btn:hover {
+      background-color: #fca5a5;
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0px #000000;
+    }
+    .back-btn:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px #000000;
+    }
+    .player-list-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .player-list-table th, .player-list-table td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 2px solid #000000;
+    }
+    .player-list-table th {
+      background-color: #000000;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .player-list-table td {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .player-list-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    .jersey-col {
+      font-family: var(--font-mono);
+      font-weight: 900;
+      color: var(--primary);
+      width: 90px;
+      font-size: 18px;
+    }
+
+    /* TABLES (STANDINGS AND TOP SCORERS) */
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+      background-color: var(--card-bg);
+      border-radius: 4px;
+      border: var(--border-width) solid #000000;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    .data-table th, .data-table td {
+      padding: 18px 24px;
+      border-bottom: 2px solid #000000;
+    }
+    .data-table th {
+      background-color: #000000;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .data-table tbody tr {
+      transition: background-color 0.1s ease;
+    }
+    .data-table tbody tr:hover {
+      background-color: #fafaf9;
+    }
+    .data-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Custom standings row highlights — Bold Yellow Poster effect */
+    .top-standing-row {
+      background-color: var(--accent-light) !important;
+      font-weight: 800;
+    }
+    .top-standing-row td {
+      color: #000000 !important;
+    }
+
+    .standing-rank {
+      font-family: var(--font-mono);
+      font-weight: 900;
+      width: 70px;
+      font-size: 18px;
+    }
+    .standing-team {
+      font-weight: 900;
+      font-size: 17px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .standing-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #000000;
+    }
+    .standing-score {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      text-align: center;
+    }
+    .data-table th.center-header, .data-table td.center-score {
+      text-align: center;
+      font-weight: 800;
+      font-family: var(--font-mono);
+    }
+    .points-col {
+      font-family: var(--font-mono);
+      font-weight: 900;
+      font-size: 18px;
+      color: var(--text-main);
+    }
+
+    /* TOP SCORERS EXTRAs */
+    .scorers-rank-badge {
+      font-size: 20px;
+      font-family: var(--font-mono);
+      font-weight: 900;
+    }
+    .scorer-goals {
+      font-family: var(--font-mono);
+      font-weight: 950;
+      color: var(--primary);
+      font-size: 18px;
+      text-transform: uppercase;
+    }
+    .top-standing-row .scorer-goals {
+      color: #000000;
+    }
+
+    /* FOOTER */
+    footer {
+      background-color: #000000;
+      color: #e4e4e7;
+      padding: 36px 0;
+      margin-top: auto;
+      font-size: 15px;
+      font-weight: 600;
+      border-top: var(--border-width) solid #000000;
+    }
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .admin-link {
+      color: var(--accent-light);
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      padding: 8px 16px;
+      border-radius: 4px;
+      border: 2px solid var(--accent-light);
+      transition: all 0.15s ease;
+    }
+    .admin-link:hover {
+      color: #000000;
+      background-color: var(--accent-light);
+      transform: translateY(-2px);
+    }
+
+    /* PASSWORD MODAL OVERLAY */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(5px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .modal-overlay.open {
+      display: flex;
+      opacity: 1;
+    }
+    .modal-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      width: 100%;
+      max-width: 440px;
+      padding: 36px;
+      box-shadow: 8px 8px 0px #000000;
+      transform: scale(0.92);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      border: var(--border-width) solid #000000;
+    }
+    .modal-overlay.open .modal-card {
+      transform: scale(1);
+    }
+    .modal-header {
+      margin-bottom: 28px;
+      text-align: center;
+    }
+    .modal-logo {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background-color: var(--white);
+      color: #000000;
+      border: 2.5px solid #000000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px auto;
+      font-size: 26px;
+      box-shadow: 2px 2px 0px #000000;
+    }
+    .modal-title {
+      font-size: 24px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
+      color: var(--text-main);
+    }
+    .modal-desc {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      font-weight: 600;
+    }
+    .modal-input-group {
+      margin-bottom: 24px;
+    }
+    .modal-input-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 850;
+      color: var(--text-main);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .modal-input {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 4px;
+      border: var(--border-width) solid #000000;
+      font-size: 16px;
+      font-weight: 700;
+      color: #000000;
+      transition: box-shadow 0.15s ease;
+    }
+    .modal-input:focus {
+      background-color: #fafafa;
+      box-shadow: 4px 4px 0px #000000;
+    }
+    .modal-error {
+      color: var(--danger);
+      background-color: #fff1f2;
+      border: var(--border-width) solid #e11d48;
+      padding: 12px 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 20px;
+      display: none;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 16px;
+    }
+    .modal-btn {
+      flex: 1;
+      padding: 14px 20px;
+      border-radius: 4px;
+      font-weight: 900;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: var(--border-width) solid #000000;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.1s;
+    }
+    .modal-btn-cancel {
+      background-color: #f3f4f6;
+      color: #000000;
+    }
+    .modal-btn-cancel:hover {
+      background-color: #e5e7eb;
+      transform: translate(-1px, -1px);
+      box-shadow: 5px 5px 0px #000000;
+    }
+    .modal-btn-cancel:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px #000000;
+    }
+    .modal-btn-confirm {
+      background-color: var(--accent-light);
+      color: #000000;
+    }
+    .modal-btn-confirm:hover {
+      background-color: var(--accent);
+      transform: translate(-1px, -1px);
+      box-shadow: 5px 5px 0px #000000;
+    }
+    .modal-btn-confirm:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px #000000;
+    }
+
+    /* ADMIN DASHBOARD */
+    .admin-dashboard {
+      position: fixed;
+      inset: 0;
+      background-color: var(--bg);
+      z-index: 90;
+      overflow-y: auto;
+      display: none;
+      opacity: 0;
+      flex-direction: column;
+      transition: opacity 0.25s ease;
+    }
+    .admin-dashboard.visible {
+      display: flex;
+      opacity: 1;
+    }
+    .admin-header {
+      background-color: var(--admin-dark);
+      color: white;
+      padding: 12px 0;
+      border-bottom: var(--border-width) solid #000000;
+    }
+    .admin-brand {
+      font-size: 20px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .admin-logout-btn {
+      background-color: var(--white);
+      border: var(--border-width) solid #000000;
+      color: #000000;
+      padding: 10px 20px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.12s;
+    }
+    .admin-logout-btn:hover {
+      background-color: var(--danger-light);
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0px #000000;
+    }
+    .admin-logout-btn:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px #000000;
+    }
+
+    /* ADMIN TABS STRIP */
+    .admin-tabs {
+      background-color: var(--admin);
+      padding: 0;
+      border-bottom: var(--border-width) solid #000000;
+    }
+    .admin-tab-btn {
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,0.8);
+      padding: 16px 24px;
+      font-size: 14px;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.15s;
+    }
+    .admin-tab-btn:hover {
+      color: white;
+    }
+    .admin-tab-btn.active {
+      color: #000000;
+      background-color: var(--white);
+      border-left: var(--border-width) solid #000000;
+      border-right: var(--border-width) solid #000000;
+      border-top: var(--border-width) solid #000000;
+      margin-top: 4px;
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+    }
+
+    /* ADMIN BODY AND TAB CONTENT */
+    .admin-body {
+      flex: 1;
+      padding: 48px 0;
+    }
+    .admin-tab-content {
+      display: none;
+    }
+    .admin-tab-content.active {
+      display: block;
+    }
+
+    /* FORMS & LAYOUTS FOR ADMIN */
+    .admin-grid-layout {
+      display: grid;
+      grid-template-columns: 1.25fr 1.75fr;
+      gap: 36px;
+      align-items: start;
+    }
+    .admin-card {
+      background-color: var(--white);
+      border-radius: 4px;
+      border: var(--border-width) solid #000000;
+      box-shadow: var(--shadow);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+    .admin-card-title {
+      font-size: 20px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
+      margin-bottom: 20px;
+      color: var(--text-main);
+      border-bottom: var(--border-width) solid #000000;
+      padding-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .admin-sub-info {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+
+    /* FORM ELEMENTS */
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 850;
+      color: var(--text-main);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 4px;
+      border: var(--border-width) solid #000000;
+      font-size: 15px;
+      font-weight: 700;
+      background-color: #ffffff;
+      color: #000000;
+      transition: all 0.12s;
+    }
+    .form-input:focus, .form-select:focus {
+      background-color: #fafafa;
+      box-shadow: 4px 4px 0px #000000;
+    }
+    .form-btn {
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: 4px;
+      border: var(--border-width) solid #000000;
+      font-weight: 900;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.1s;
+    }
+    .form-btn-primary {
+      background-color: var(--accent-light);
+      color: #000000;
+    }
+    .form-btn-primary:hover {
+      background-color: var(--accent);
+      transform: translate(-1px, -1px);
+      box-shadow: 5px 5px 0px #000000;
+    }
+    .form-btn-primary:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px #000000;
+    }
+    .form-btn-cancel {
+      background-color: #f3f4f6;
+      color: #000000;
+      margin-top: 10px;
+    }
+    .form-btn-cancel:hover {
+      background-color: #e5e7eb;
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0px #000000;
+    }
+    .form-btn-cancel:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px #000000;
+    }
+
+    /* DYNAMIC PLAYERS INPUT GRID */
+    .players-form-header {
+      display: grid;
+      grid-template-columns: 80px 1fr 44px;
+      gap: 12px;
+      margin-bottom: 8px;
+      font-size: 12px;
+      font-weight: 850;
+      color: var(--text-main);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding-left: 4px;
+    }
+    .players-inputs-container {
+      max-height: 300px;
+      overflow-y: auto;
+      border: var(--border-width) solid #000000;
+      border-radius: 4px;
+      padding: 14px;
+      background-color: #fafafa;
+      margin-bottom: 24px;
+    }
+    .player-row-input {
+      display: grid;
+      grid-template-columns: 80px 1fr 44px;
+      gap: 12px;
+      margin-bottom: 10px;
+      align-items: stretch;
+    }
+    .player-row-input:last-child {
+      margin-bottom: 0;
+    }
+
+    .btn-delete-input {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      min-height: 44px;
+      height: auto;
+      padding: 0;
+      border: var(--border-width) solid #000000;
+      background-color: #ffeff0;
+      color: #991b1b;
+      font-weight: 950;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 2px 2px 0px #000000;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .btn-delete-input:hover {
+      background-color: #fecaca;
+    }
+    .btn-delete-input:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px #000000;
+    }
+
+    /* ACTION LISTS */
+    .admin-list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px;
+      border: var(--border-width) solid #000000;
+      border-radius: 4px;
+      margin-bottom: 14px;
+      background-color: #ffffff;
+      box-shadow: var(--shadow-sm);
+    }
+    .admin-list-item:last-child {
+      margin-bottom: 0;
+    }
+    .admin-list-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .admin-badge-preview {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      color: white;
+      border: 2px solid #000000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 900;
+      box-shadow: 1px 1px 0px #000000;
+    }
+    .admin-list-title {
+      font-weight: 850;
+      font-size: 17px;
+      text-transform: uppercase;
+    }
+    .admin-list-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+    .admin-list-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .action-btn {
+      padding: 8px 14px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      border: 2px solid #000000;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 2px 2px 0px #000000;
+      transition: all 0.1s;
+    }
+    .action-btn-edit {
+      background-color: var(--accent-light);
+      color: #000000;
+    }
+    .action-btn-edit:hover {
+      background-color: var(--accent);
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px #000000;
+    }
+    .action-btn-edit:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px #000000;
+    }
+    .action-btn-delete {
+      background-color: var(--danger-light);
+      color: #000000;
+    }
+    .action-btn-delete:hover {
+      background-color: var(--danger);
+      color: #ffffff;
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px #000000;
+    }
+    .action-btn-delete:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px #000000;
+    }
+
+    /* PLAIN TABLE STYLES FOR ADMIN TABLE TRANSFERS */
+    .admin-table-item {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr 44px;
+      gap: 14px;
+      align-items: center;
+      padding: 14px 18px;
+      border-bottom: 2px solid #000000;
+    }
+    .admin-table-header {
+      background-color: #000000;
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+    }
+
+    .btn-clear-table-row {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      height: 38px;
+      width: 38px;
+      border: 1.5px solid #000000;
+      background-color: #ffeff0;
+      color: #991b1b;
+      font-weight: 900;
+      font-size: 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 1.5px 1.5px 0px #000000;
+      margin: 0 auto;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .btn-clear-table-row:hover {
+      background-color: #fecaca;
+    }
+    .btn-clear-table-row:active {
+      transform: translate(1px, 1px);
+      box-shadow: 0px 0px 0px #000000;
+    }
+    .admin-table-item .team-name {
+      font-weight: 900;
+      font-size: 16px;
+      text-transform: uppercase;
+    }
+    .admin-table-item input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 2px solid #000000;
+      border-radius: 4px;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 15px;
+    }
+
+    .admin-computed-pts {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-weight: 900;
+      font-size: 17px;
+      color: var(--text-main);
+    }
+
+    /* TOAST NOTIFICATION */
+    .toast-notif {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background-color: var(--accent-light);
+      color: #000000;
+      padding: 16px 28px;
+      border: var(--border-width) solid #000000;
+      border-radius: 4px;
+      font-weight: 900;
+      text-transform: uppercase;
+      box-shadow: var(--shadow);
+      transform: translateY(120px) rotate(1deg);
+      opacity: 0;
+      z-index: 200;
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .toast-notif.show {
+      transform: translateY(0) rotate(-1deg);
+      opacity: 1;
+    }
+
+    /* RESPONSIVE MEDIA QUERIES */
+    @media (max-width: 992px) {
+      .admin-grid-layout {
+        grid-template-columns: 1fr;
+      }
+      .teams-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .desktop-nav {
+        display: none;
+      }
+      .mobile-menu-btn {
+        display: block;
+      }
+      .teams-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+      .hero-title {
+        font-size: 44px;
+      }
+      .hero-subtitle {
+        font-size: 18px;
+      }
+      .admin-list-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+      }
+      .admin-list-actions {
+        justify-content: flex-end;
+      }
+      .footer-content {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .teams-grid {
+        grid-template-columns: 1fr;
+      }
+      .admin-table-item {
+        grid-template-columns: 1.5fr 1fr 1fr 1fr 0.8fr 34px;
+        font-size: 11px;
+        padding: 10px 4px;
+        gap: 4px;
+      }
+      .admin-table-item input {
+        padding: 6px 4px;
+      }
+    }
+
+    /* DARK THEME STYLINGS */
+    body.dark-theme {
+      --bg: #0b0f19;
+      --card-bg: #151d30;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-secondary: #cbd5e1;
+      --white: #151d30;
+      --border-color: #ffffff;
+      --shadow-sm: 3px 3px 0px 0px #ffffff;
+      --shadow: 6px 6px 0px 0px #ffffff;
+      --shadow-lg: 8px 8px 0px 0px #ffffff;
+    }
+    
+    /* Dynamic border inversion in dark mode */
+    body.dark-theme header,
+    body.dark-theme footer,
+    body.dark-theme .hero-container,
+    body.dark-theme .nav-btn.active,
+    body.dark-theme .mobile-menu-btn,
+    body.dark-theme .page-section,
+    body.dark-theme .card,
+    body.dark-theme .team-card,
+    body.dark-theme .detail-container,
+    body.dark-theme .data-table,
+    body.dark-theme th,
+    body.dark-theme td,
+    body.dark-theme input,
+    body.dark-theme select,
+    body.dark-theme textarea,
+    body.dark-theme button,
+    body.dark-theme .form-select,
+    body.dark-theme .form-input,
+    body.dark-theme .admin-list-item,
+    body.dark-theme .admin-table-item,
+    body.dark-theme .badge-logo,
+    body.dark-theme .confirm-card,
+    body.dark-theme .modal-card,
+    body.dark-theme .dialog-card {
+      border-color: #ffffff !important;
+    }
+    body.dark-theme .card,
+    body.dark-theme .team-card,
+    body.dark-theme .detail-container,
+    body.dark-theme .hero-container,
+    body.dark-theme .confirm-card,
+    body.dark-theme .modal-card {
+      box-shadow: var(--shadow) !important;
+    }
+    body.dark-theme .dashboard-stats-grid > div {
+      background-color: #1a253c;
+      border-color: #ffffff !important;
+      box-shadow: var(--shadow) !important;
+    }
+    body.dark-theme .admin-header,
+    body.dark-theme .admin-body,
+    body.dark-theme .admin-dashboard {
+      background-color: #0b0f19 !important;
+      color: #ffffff !important;
+    }
+    body.dark-theme .admin-list-item,
+    body.dark-theme .admin-list-item *,
+    body.dark-theme .admin-table-item,
+    body.dark-theme .admin-table-item * {
+      border-color: #ffffff !important;
+    }
+    body.dark-theme .modal-input-group label,
+    body.dark-theme .form-group label {
+      color: #cbd5e1 !important;
+    }
+    body.dark-theme #display-tournament-title {
+      color: #ffffff !important;
+    }
+    body.dark-theme #display-tournament-subtitle {
+      color: #e2e8f0 !important;
+    }
+
+    /* FIXTURES STYLING */
+    .fixtures-filter-bar {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+    .fixture-filter-btn {
+      padding: 10px 20px;
+      background-color: var(--white);
+      border: var(--border-width) solid #000000;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.1s;
+    }
+    .fixture-filter-btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0px 0px #000000;
+    }
+    .fixture-filter-btn:active, .fixture-filter-btn.active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px 0px #000000;
+      background-color: var(--primary);
+      color: white;
+    }
+    body.dark-theme .fixture-filter-btn {
+      border-color: #ffffff;
+      color: #ffffff !important;
+      background-color: #1a253c;
+    }
+    body.dark-theme .fixture-filter-btn:active, 
+    body.dark-theme .fixture-filter-btn.active {
+      background-color: var(--primary);
+      color: white !important;
+    }
+    .fixtures-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+    .fixture-card {
+      background-color: var(--card-bg);
+      border: var(--border-width) solid #000000;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      transition: all 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .fixture-card:hover {
+      transform: translate(-3px, -3px);
+      box-shadow: 9px 9px 0px 0px #000000;
+    }
+    body.dark-theme .fixture-card {
+      border-color: #ffffff !important;
+      background-color: #111827;
+    }
+    .fixture-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px dashed #e2e8f0;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    body.dark-theme .fixture-header {
+      border-bottom-color: #3f3f46;
+    }
+    .fixture-info-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .fixture-date-time {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    body.dark-theme .fixture-date-time {
+      color: #cbd5e1 !important;
+    }
+    .fixture-venue {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    body.dark-theme .fixture-venue {
+      color: #94a3b8;
+    }
+    .fixture-status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      border: 1.5px solid #000000;
+      letter-spacing: 0.5px;
+    }
+    body.dark-theme .fixture-status-badge {
+      border-color: #ffffff;
+    }
+    .fixture-status-badge.upcoming {
+      background-color: var(--accent-light);
+      color: var(--accent-dark);
+    }
+    .fixture-status-badge.completed {
+      background-color: var(--success-light);
+      color: var(--success);
+    }
+    .fixture-status-badge.live {
+      background-color: var(--danger-light);
+      color: var(--danger);
+      animation: pulse-live 1.5s infinite;
+    }
+    @keyframes pulse-live {
+      0% { opacity: 1; }
+      50% { opacity: 0.6; }
+      100% { opacity: 1; }
+    }
+    .fixture-teams-row {
+      display: grid;
+      grid-template-columns: 1fr 120px 1fr;
+      align-items: center;
+      gap: 16px;
+    }
+    .fixture-team-block {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .fixture-team-block.home {
+      justify-content: flex-end;
+      text-align: right;
+    }
+    .fixture-team-block.away {
+      justify-content: flex-start;
+      text-align: left;
+    }
+    .fixture-team-badge {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: var(--border-width) solid #000000;
+      box-shadow: 2px 2px 0px #000000;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    body.dark-theme .fixture-team-badge {
+      border-color: #ffffff !important;
+      box-shadow: 2px 2px 0px #ffffff;
+    }
+    .fixture-team-name {
+      font-size: 18px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
+      color: var(--text-main);
+    }
+    body.dark-theme .fixture-team-name {
+      color: #ffffff !important;
+    }
+    .fixture-vs-score-block {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .fixture-vs-badge {
+      font-weight: 950;
+      font-size: 14px;
+      background-color: var(--white);
+      border: 2px solid #000000;
+      padding: 6px 14px;
+      border-radius: var(--radius);
+      box-shadow: 2px 2px 0px #000000;
+      text-transform: uppercase;
+    }
+    body.dark-theme .fixture-vs-badge {
+      background-color: #1a253c;
+      color: #ffffff;
+      border-color: #ffffff;
+      box-shadow: 2px 2px 0px #ffffff;
+    }
+    .fixture-scores {
+      font-family: var(--font-mono);
+      font-size: 26px;
+      font-weight: 950;
+      letter-spacing: -1px;
+      background-color: #000000;
+      color: #ffffff;
+      padding: 4px 14px;
+      border-radius: var(--radius);
+      border: var(--border-width) solid #000000;
+      box-shadow: 3px 3px 0px rgba(0,0,0,0.15);
+      display: inline-flex;
+      gap: 10px;
+    }
+    body.dark-theme .fixture-scores {
+      background-color: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
+    }
+    .fixture-score-item {
+      min-width: 20px;
+      text-align: center;
+    }
+    .fixture-winner-indicator {
+      font-size: 14px;
+      color: var(--accent);
+      margin-left: 4px;
+      margin-right: 4px;
+    }
+
+    /* ADMIN FIXTURES */
+    .admin-fixture-list-item {
+      background-color: var(--white);
+      border: var(--border-width) solid #000000;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 16px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    body.dark-theme .admin-fixture-list-item {
+      border-color: #ffffff !important;
+      background-color: #111827;
+    }
+    .admin-fixture-list-item:hover {
+      border-color: var(--admin);
+    }
+    body.dark-theme .admin-fixture-list-item:hover {
+      border-color: #a855f7 !important;
+    }
+    .admin-fixture-top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    body.dark-theme .admin-fixture-top {
+      color: #94a3b8;
+    }
+    .admin-fixture-matchup {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 800;
+      font-size: 15px;
+    }
+    .admin-fixture-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    
+    @media (max-width: 768px) {
+      .fixture-teams-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      .fixture-team-block.home {
+        justify-content: flex-start;
+        flex-direction: row-reverse;
+        text-align: left;
+      }
+      .fixture-team-block {
+        justify-content: flex-start;
+        text-align: left;
+      }
+      .fixture-vs-score-block {
+        justify-content: flex-start;
+        padding-left: 66px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- STICKY HEADER -->
+  <header>
+    <div class="container nav-container">
+      <div class="logo-area" onclick="navigate('home')">
+        <span>BRO TOURNAMENT</span>
+      </div>
+      <nav class="desktop-nav">
+        <button class="nav-btn active" onclick="navigate('home')">Home</button>
+        <button class="nav-btn" onclick="navigate('teams')">Select Team</button>
+        <button class="nav-btn" onclick="navigate('fixtures')">Fixtures</button>
+        <button class="nav-btn" onclick="navigate('table')">Tournament Table</button>
+        <button class="nav-btn" onclick="navigate('scorers')">Top Scorers</button>
+      </nav>
+      <!-- Football Theme Toggler -->
+      <div class="theme-toggle-wrap" onclick="toggleTheme()" title="Switch Light/Dark Mode">
+        <span style="font-size: 11px; font-weight: 900; text-transform: uppercase; color: #ffffff; letter-spacing: 0.5px; opacity: 0.9;" id="theme-label">LIGHT</span>
+        <div class="football-switch" style="width: 50px; height: 26px; background-color: #000000; border: 2.5px solid #ffffff; border-radius: 13px; position: relative; transition: background-color 0.3s; overflow: hidden; display: flex; align-items: center;">
+          <div id="football-switch-knob" style="width: 18px; height: 18px; background: #ffffff; border-radius: 50%; position: absolute; top: 1.5px; left: 2px; display: flex; align-items: center; justify-content: center; font-size: 13px; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform: translateX(0px);">
+            ⚽
+          </div>
+        </div>
+      </div>
+      <!-- Hamburger -->
+      <button class="mobile-menu-btn" onclick="toggleMobileNav()">☰</button>
+    </div>
+    <!-- Mobile dropdown list -->
+    <div id="mobile-nav-menu" class="mobile-nav-dropdown">
+      <button class="nav-btn active" onclick="navigateMobile('home')">Home</button>
+      <button class="nav-btn" onclick="navigateMobile('teams')">Select Team</button>
+      <button class="nav-btn" onclick="navigateMobile('fixtures')">Fixtures</button>
+      <button class="nav-btn" onclick="navigateMobile('table')">Tournament Table</button>
+      <button class="nav-btn" onclick="navigateMobile('scorers')">Top Scorers</button>
+    </div>
+  </header>
+
+  <!-- MAIN AREA -->
+  <main>
+
+    <!-- 1. HOME PAGE -->
+    <section id="page-home" class="page-section active">
+      <div class="container">
+        <div class="hero-container">
+          <div class="hero-pitch-penalty"></div>
+          <div class="hero-content">
+            <span class="badge-premium">🏆 BRO TOURNAMENT 2026</span>
+            <h1 class="hero-title" id="display-tournament-title">Bro Tournament</h1>
+            <p class="hero-subtitle" id="display-tournament-subtitle">0 Teams · 0 Matches · 1 Champion</p>
+            <button class="hero-cta-btn" onclick="navigate('table')">
+              <span>View Standings</span>
+              <span>➔</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. SELECT TEAM PAGE -->
+    <section id="page-teams" class="page-section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Select Your Team</h2>
+          <p class="section-desc">Click any team to view their official squad players & jersey numbers.</p>
+        </div>
+
+        <!-- 3-Column Grid for Teams -->
+        <div class="teams-grid" id="teams-grid-container">
+          <!-- Dynamic Team Cards -->
+        </div>
+
+        <!-- Player List Sub-View -->
+        <div class="detail-container" id="team-detail-container">
+          <div class="detail-header">
+            <div class="detail-title-wrap">
+              <div class="detail-badge-mini" id="detail-team-badge">RT</div>
+              <h3 class="detail-title" id="detail-team-name">Red Eagles</h3>
+            </div>
+            <button class="back-btn" onclick="hidePlayerList()">← Back to Teams</button>
+          </div>
+          <table class="player-list-table">
+            <thead>
+              <tr>
+                <th class="jersey-col">No.</th>
+                <th>Player Name</th>
+              </tr>
+            </thead>
+            <tbody id="detail-players-body">
+              <!-- Dynamic Player Rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. TOURNAMENT TABLE PAGE -->
+    <section id="page-table" class="page-section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Tournament Standings</h2>
+          <p class="section-desc">Real-time standings. Top team is awarded the Gold Ribbon of Excellence 🏆</p>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="standing-rank">#</th>
+                <th>Team</th>
+                <th class="center-header">Played</th>
+                <th class="center-header">Won</th>
+                <th class="center-header">Lost</th>
+                <th class="center-header">Drawn</th>
+                <th class="center-header points-col">Points</th>
+              </tr>
+            </thead>
+            <tbody id="public-standings-body">
+              <!-- Dynamic Standings Rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. TOP SCORERS PAGE -->
+    <section id="page-scorers" class="page-section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Top Scorers</h2>
+          <p class="section-desc">Golden Boot leaderboard. Tracking the sharpest strikers in the league.</p>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="standing-rank">Rank</th>
+                <th>Player Name</th>
+                <th>Team</th>
+                <th class="scorer-goals">Goals</th>
+              </tr>
+            </thead>
+            <tbody id="public-scorers-body">
+              <!-- Dynamic Scorers Rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. MATCH FIXTURES PAGE -->
+    <section id="page-fixtures" class="page-section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Tournament Fixtures</h2>
+          <p class="section-desc">Keep track of upcoming matchups, live scores, and final matchday results.</p>
+        </div>
+
+        <div class="fixtures-filter-bar">
+          <button class="fixture-filter-btn active" id="filter-fixture-all" onclick="setFixtureFilter('all')">All Matches</button>
+          <button class="fixture-filter-btn" id="filter-fixture-upcoming" onclick="setFixtureFilter('upcoming')">Scheduled</button>
+          <button class="fixture-filter-btn" id="filter-fixture-completed" onclick="setFixtureFilter('completed')">Results</button>
+        </div>
+
+        <div class="fixtures-grid" id="public-fixtures-list">
+          <!-- Dynamic Fixtures Cards -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- DISCREET FOOTER -->
+  <footer>
+    <div class="container footer-content">
+      <span>© 2026 All rights reserved to OGvasuannan</span>
+      <span class="admin-link" onclick="openLoginModal()">⚙ Dashboard Access</span>
+    </div>
+  </footer>
+
+  <!-- PASSWORD MODAL DIALOG -->
+  <div id="login-modal" class="modal-overlay" onclick="closeLoginModalOnOutsideClick(event)">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-logo">⚙</div>
+        <h3 class="modal-title">Admin Authorization</h3>
+        <p class="modal-desc">Enter security key to access database overrides.</p>
+      </div>
+      <div class="modal-error" id="login-error-msg">❌ Incorrect password. Please try again.</div>
+      <form onsubmit="handleLoginSubmit(event)">
+        <div class="modal-input-group">
+          <label for="admin-password">Dashboard Password</label>
+          <input type="password" id="admin-password" class="modal-input" placeholder="••••••••" required />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="modal-btn modal-btn-cancel" onclick="closeLoginModal()">Cancel</button>
+          <button type="submit" class="modal-btn modal-btn-confirm">Authenticate</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADMIN DASHBOARD OVERLAY PANEL -->
+  <div id="admin-panel" class="admin-dashboard">
+    <div class="admin-header">
+      <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <div class="admin-brand">
+          <span>⚙</span>
+          <span>ADMIN DASHBOARD — DATABASE EDITOR</span>
+        </div>
+        <!-- Supabase Indicator -->
+        <div id="supabase-status-indicator" style="display: flex; align-items: center; gap: 8px; font-size: 11px; background: rgba(0,0,0,0.2); padding: 6px 14px; border-radius: 20px; font-weight: bold; border: 1.5px solid rgba(255,255,255,0.15); cursor: pointer; margin-left: auto; margin-right: 16px; user-select: none;" onclick="openSupabaseDialog()">
+          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #eab308;" id="supabase-status-dot"></span>
+          <span id="supabase-status-text" style="color: #ffffff; text-transform: uppercase; letter-spacing: 0.5px;">Checking DB...</span>
+        </div>
+        <button class="admin-logout-btn" onclick="logoutAdmin()">Logout Session</button>
+      </div>
+    </div>
+
+    <!-- ADMIN TABS REGION -->
+    <div class="admin-tabs">
+      <div class="container" style="display: flex; gap: 12px; width: 100%;">
+        <button class="admin-tab-btn active" id="tab-btn-teams" onclick="switchAdminTab('teams')">Teams & Squads</button>
+        <button class="admin-tab-btn" id="tab-btn-table" onclick="switchAdminTab('table')">Tournament Stats</button>
+        <button class="admin-tab-btn" id="tab-btn-scorers" onclick="switchAdminTab('scorers')">Scorer Database</button>
+        <button class="admin-tab-btn" id="tab-btn-fixtures" onclick="switchAdminTab('fixtures')">Match Fixtures</button>
+      </div>
+    </div>
+
+    <!-- ADMIN BODY CARRIER -->
+    <div class="admin-body">
+      <div class="container">
+
+        <!-- TAB 1 — TEAMS AND PLAYERS -->
+        <div id="admin-tab-teams" class="admin-tab-content active">
+          <div class="admin-grid-layout">
+            
+            <!-- Left Panel: Form -->
+            <div class="admin-card">
+              <h4 class="admin-card-title" id="team-form-title">Add New Team</h4>
+              <form id="team-edit-form" onsubmit="handleTeamFormSubmit(event)">
+                <input type="hidden" id="edit-team-id" value="" />
+                
+                <div class="form-group">
+                  <label for="form-team-name">Team Name</label>
+                  <div style="display: flex; gap: 8px;">
+                    <input type="text" id="form-team-name" class="form-input" placeholder="e.g. Red Eagles" required style="flex: 1;" />
+                    <button type="button" class="btn-delete-input" onclick="clearInput('form-team-name')" title="Clear Team Name">✕</button>
+                  </div>
+                </div>
+                
+                <div class="form-group">
+                  <label for="form-team-color">Badge Color Accent</label>
+                  <div style="display: flex; gap: 8px;">
+                    <select id="form-team-color" class="form-select" style="flex: 1;">
+                      <option value="#dc2626">🔴 Red Accent</option>
+                      <option value="#2563eb">🔵 Blue Accent</option>
+                      <option value="#16a34a">🟢 Green Accent</option>
+                      <option value="#ca8a04">🟡 Gold Accent</option>
+                      <option value="#1f2937">⚫ Black Accent</option>
+                      <option value="#7c3aed">🟣 Purple Accent</option>
+                    </select>
+                    <button type="button" class="btn-delete-input" onclick="resetTeamColor()" title="Reset to default color">✕</button>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="form-team-flag">Team Flag / Badge symbol</label>
+                  <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; gap: 8px; width: 100%;">
+                      <select id="form-team-flag" class="form-select" onchange="syncCustomFlagInput()" style="flex: 1;">
+                        <option value="⚽">⚽ Soccer Ball</option>
+                        <option value="🏆">🏆 Trophy</option>
+                        <option value="🦁">🦁 Lion</option>
+                        <option value="🦅">🦅 Eagle</option>
+                        <option value="🐉">🐉 Dragon</option>
+                        <option value="⚡">⚡ Lightning</option>
+                        <option value="👑">👑 Crown</option>
+                        <option value="🔥">🔥 Fire</option>
+                        <option value="🇧🇷">🇧🇷 Brazil</option>
+                        <option value="🇦🇷">🇦🇷 Argentina</option>
+                        <option value="🇫🇷">🇫🇷 France</option>
+                        <option value="🇩🇪">🇩🇪 Germany</option>
+                        <option value="🇪🇸">🇪🇸 Spain</option>
+                        <option value="🇮🇹">🇮🇹 Italy</option>
+                        <option value="🇵🇹">🇵🇹 Portugal</option>
+                        <option value="🏴󠁧󠁢󠁥󠁮󠁧󠁿">🏴󠁧󠁢󠁥󠁮󠁧󠁿 England</option>
+                        <option value="🇳🇬">🇳🇬 Nigeria</option>
+                        <option value="🇯🇵">🇯🇵 Japan</option>
+                        <option value="🇮🇳">🇮🇳 India</option>
+                        <option value="🇺🇸">🇺🇸 United States</option>
+                        <option value="custom">✍️ Custom Emoji...</option>
+                      </select>
+                      <button type="button" class="btn-delete-input" onclick="clearFlagInput()" title="Delete Flag selection">✕</button>
+                    </div>
+                    
+                    <input type="text" id="form-team-flag-custom" class="form-input" placeholder="e.g. 🦊" style="display: none;" maxlength="10" />
+                  </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 12px; margin-bottom: 12px;">
+                  <label>Or add team flag as custom image (Upload file / enter URL)</label>
+                  <div style="display: flex; flex-direction: column; gap: 10px; border: 1.5px dashed var(--accent-light); border-radius: 6px; padding: 12px; background-color: rgba(0,0,0,0.015);">
+                    
+                    <!-- Upload File section -->
+                    <div>
+                      <span style="font-size: 11px; font-weight: 700; color: var(--text-main); display: block; margin-bottom: 4px;">📂 Upload Local Image (Max 1MB):</span>
+                      <input type="file" id="form-team-flag-file" accept="image/*" class="form-input" onchange="handleFlagImageUpload(event)" />
+                      <div id="flag-image-preview-container" style="display: none; margin-top: 8px; align-items: center; gap: 10px;">
+                        <div id="flag-image-preview" style="width: 45px; height: 45px; border-radius: 50%; border: 2.5px solid #000; overflow: hidden; background-color: #fff; display: flex; align-items: center; justify-content: center;"></div>
+                        <span style="font-size: 11px; color: var(--text-muted); cursor: pointer; text-decoration: underline;" onclick="deleteUploadedFlag()">Remove Image</span>
+                      </div>
+                    </div>
+
+                    <div style="border-top: 1px dotted rgba(0,0,0,0.1); margin: 2px 0;"></div>
+
+                    <!-- Web URL section -->
+                    <div>
+                      <span style="font-size: 11px; font-weight: 700; color: var(--text-main); display: block; margin-bottom: 4px;">🌐 Or enter Flag Image Web URL:</span>
+                      <input type="text" id="form-team-flag-url" class="form-input" placeholder="https://example.com/logo.png" oninput="handleFlagUrlInput()" />
+                      <div id="flag-url-preview-container" style="display: none; margin-top: 8px; align-items: center; gap: 10px;">
+                        <div id="flag-url-preview" style="width: 45px; height: 45px; border-radius: 50%; border: 2.5px solid #000; overflow: hidden; background-color: #fff; display: flex; align-items: center; justify-content: center;"></div>
+                        <span style="font-size: 11px; color: var(--text-muted); cursor: pointer; text-decoration: underline;" onclick="deleteUrlFlag()">Remove URL</span>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+                
+                <!-- 11 Player Inputs Scrollbox -->
+                <div class="form-group">
+                  <label>Team Squad (Up to 11 Players)</label>
+                  <div class="players-form-header">
+                    <span>Jersey #</span>
+                    <span>Player Name</span>
+                    <span style="text-align: center;">Clear</span>
+                  </div>
+                  <div class="players-inputs-container" id="players-input-list">
+                    <!-- Javascript generates 11 input fields -->
+                  </div>
+                </div>
+
+                <button type="submit" class="form-btn form-btn-primary" id="team-submit-btn">Add Team</button>
+                <button type="button" class="form-btn form-btn-cancel" id="team-cancel-btn" style="display:none;" onclick="cancelTeamEdit()">Cancel Edit</button>
+              </form>
+            </div>
+
+            <!-- Right Panel: List -->
+            <div class="admin-card">
+              <h4 class="admin-card-title">Current Registered Teams</h4>
+              <div id="admin-teams-list">
+                <!-- Javascript populates -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- TAB 2 — STANDINGS TABLE EDIT -->
+        <div id="admin-tab-table" class="admin-tab-content">
+          <div class="admin-card">
+            <h4 class="admin-card-title">
+              <span>Edit Standings Real-time Matrix</span>
+              <span class="admin-sub-info">Points are calculated automatically: Points = (W × 3) + D</span>
+            </h4>
+            <div style="margin-bottom: 24px;">
+              <div class="admin-table-item admin-table-header">
+                <span>Team Name</span>
+                <span style="text-align:center">Won</span>
+                <span style="text-align:center">Lost</span>
+                <span style="text-align:center">Drawn</span>
+                <span style="text-align:center">Points</span>
+                <span style="text-align:center">Reset</span>
+              </div>
+              <div id="admin-standings-list">
+                <!-- Generated dynamically -->
+              </div>
+            </div>
+            <button class="form-btn form-btn-primary" style="max-width: 250px; margin: 0 auto; display: block;" onclick="saveAdminStandings()">Save All Stats Matrix</button>
+            <button class="form-btn" style="max-width: 320px; margin: 12px auto 0 auto; display: block; background-color: var(--secondary); border: var(--border-width) solid #000000; box-shadow: var(--shadow-sm); color: white; font-weight: 800; font-size: 13px; text-transform: uppercase; padding: 10px 14px; cursor: pointer;" onclick="autoRecomputeStandingsFromFixtures()">🪄 Auto-Calculate Standings from Fixtures</button>
+          </div>
+        </div>
+
+        <!-- TAB 3 — TOP SCORERS EDIT -->
+        <div id="admin-tab-scorers" class="admin-tab-content">
+          <div class="admin-grid-layout">
+            
+            <!-- Left Side: Add/Edit Form -->
+            <div class="admin-card">
+              <h4 class="admin-card-title" id="scorer-form-title">Add Golden Boot Entry</h4>
+              <form id="scorer-edit-form" onsubmit="handleScorerFormSubmit(event)">
+                <input type="hidden" id="edit-scorer-index" value="" />
+                
+                <div class="form-group">
+                  <label for="form-scorer-name">Player Name</label>
+                  <div style="display: flex; gap: 8px;">
+                    <input type="text" id="form-scorer-name" class="form-input" placeholder="e.g. Arjun K." required style="flex: 1;" />
+                    <button type="button" class="btn-delete-input" onclick="clearInput('form-scorer-name')" title="Clear Player Name">✕</button>
+                  </div>
+                </div>
+                
+                <div class="form-group">
+                  <label for="form-scorer-team">Representing Team</label>
+                  <div style="display: flex; gap: 8px;">
+                    <select id="form-scorer-team" class="form-select" required style="flex: 1;">
+                      <!-- Dynamically loaded list of teams -->
+                    </select>
+                    <button type="button" class="btn-delete-input" onclick="resetScorerTeamSelect()" title="Reset Representing Team">✕</button>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="form-scorer-goals">Goals Scored</label>
+                  <div style="display: flex; gap: 8px;">
+                    <input type="number" id="form-scorer-goals" class="form-input" min="0" required style="flex: 1;" />
+                    <button type="button" class="btn-delete-input" onclick="clearInput('form-scorer-goals')" title="Clear Goals">✕</button>
+                  </div>
+                </div>
+
+                <button type="submit" class="form-btn form-btn-primary" id="scorer-submit-btn">Add Scorer</button>
+                <button type="button" class="form-btn form-btn-cancel" id="scorer-cancel-btn" style="display:none;" onclick="cancelScorerEdit()">Cancel Edit</button>
+              </form>
+            </div>
+
+            <!-- Right Side: Scorer entries -->
+            <div class="admin-card">
+              <h4 class="admin-card-title">Registered Goal leaders</h4>
+              <div id="admin-scorers-list">
+                <!-- Javascript dynamic population -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- TAB 4 — FIXTURES MANAGEMENT -->
+        <div id="admin-tab-fixtures" class="admin-tab-content">
+          <div class="admin-grid-layout">
+            
+            <!-- Left Side: Add / Edit Fixture Form -->
+            <div class="admin-card">
+              <h4 class="admin-card-title" id="fixture-form-title">Schedule A Match</h4>
+              <form id="fixture-edit-form" onsubmit="handleFixtureFormSubmit(event)">
+                <input type="hidden" id="edit-fixture-id" value="" />
+                
+                <div class="form-group">
+                  <label for="form-fixture-name">Match Name / Number</label>
+                  <input type="text" id="form-fixture-name" class="form-input" placeholder="e.g. Match 1, Match 2, Final" required />
+                </div>
+
+                <div class="form-group">
+                  <label for="form-fixture-home">Team 1</label>
+                  <select id="form-fixture-home" class="form-select" required>
+                    <!-- Dynamically loaded list of teams -->
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label for="form-fixture-away">Team 2</label>
+                  <select id="form-fixture-away" class="form-select" required>
+                    <!-- Dynamically loaded list of teams -->
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="form-fixture-date">Match Date</label>
+                  <input type="date" id="form-fixture-date" class="form-input" />
+                </div>
+
+                <div class="form-group">
+                  <label for="form-fixture-time">Kickoff Time</label>
+                  <input type="time" id="form-fixture-time" class="form-input" />
+                </div>
+
+                <div class="form-group">
+                  <label for="form-fixture-venue">Venue / Pitch</label>
+                  <input type="text" id="form-fixture-venue" class="form-input" placeholder="e.g. Pitch A, Main Ground, Turf Arena" />
+                </div>
+
+                <div class="form-group">
+                  <label for="form-fixture-status">Match Status</label>
+                  <select id="form-fixture-status" class="form-select" onchange="toggleFormFixtureScores()" required>
+                    <option value="upcoming" selected>Scheduled / Upcoming</option>
+                    <option value="completed">Completed / Finished</option>
+                    <option value="live">Live Now 🔴</option>
+                  </select>
+                </div>
+
+                <!-- Scores layout (Only shown / enabled for completed or live status) -->
+                <div id="form-fixture-scores-wrap" style="display: none; border: 2.5px dashed #000000; padding: 14px; border-radius: var(--radius); margin-bottom: 20px; background-color: rgba(0,0,0,0.03);">
+                  <div style="font-size: 13px; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; font-family: var(--font-mono);">Interim or Final score</div>
+                  <div style="display: flex; gap: 12px; align-items: center;">
+                    <div style="flex: 1;">
+                      <label style="font-size: 12px; margin-bottom: 4px; display: block; font-weight: 700;" id="form-fixture-lbl-home">Team 1 Score</label>
+                      <input type="number" id="form-fixture-homescore" class="form-input" min="0" value="0" />
+                    </div>
+                    <div style="font-weight: 900; font-size: 20px; margin-top: 18px;">—</div>
+                    <div style="flex: 1;">
+                      <label style="font-size: 12px; margin-bottom: 4px; display: block; font-weight: 700;" id="form-fixture-lbl-away">Team 2 Score</label>
+                      <input type="number" id="form-fixture-awayscore" class="form-input" min="0" value="0" />
+                    </div>
+                  </div>
+                </div>
+
+                <button type="submit" class="form-btn form-btn-primary" id="fixture-submit-btn">Schedule Match</button>
+                <button type="button" class="form-btn form-btn-cancel" id="fixture-cancel-btn" style="display:none;" onclick="cancelFixtureEdit()">Cancel Edit</button>
+              </form>
+            </div>
+
+            <!-- Right Side: Fixture matches list -->
+            <div class="admin-card">
+              <h4 class="admin-card-title">Scheduled Matches & Results</h4>
+              <div id="admin-fixtures-list" style="max-height: 550px; overflow-y: auto; padding-right: 4px;">
+                <!-- Dynamically loaded list of matches -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOM CONFIRMATION OVERLAY (Saves us from iframe alert/confirm issues!) -->
+  <div id="confirm-modal" class="confirm-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.65); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
+    <div class="confirm-card" style="background: var(--card-bg); border: var(--border-width) solid var(--border-color); border-radius: 8px; max-width: 450px; width: 90%; padding: 24px; box-shadow: var(--shadow-lg); text-align: center; color: var(--text-main); transform: rotate(-0.5deg);">
+      <div style="font-size: 32px; margin-bottom: 12px;">⚠️</div>
+      <h3 style="font-size: 20px; font-weight: 900; margin-bottom: 10px; text-transform: uppercase;">Are you sure?</h3>
+      <p id="confirm-msg" style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; font-family: var(--font-sans);"></p>
+      <div style="display: flex; gap: 12px; justify-content: center;">
+        <button id="confirm-cancel-btn" class="action-btn" style="padding: 10px 20px; border-radius: var(--radius); font-weight: 800; cursor: pointer; text-transform: uppercase; background-color: var(--white); border: 2.5px solid var(--border-color); color: var(--text-main); box-shadow: var(--shadow-sm);" onclick="closeCustomConfirm(false)">Cancel</button>
+        <button id="confirm-yes-btn" class="action-btn" style="padding: 10px 20px; border-radius: var(--radius); font-weight: 800; cursor: pointer; text-transform: uppercase; background-color: var(--danger); border: 2.5px solid var(--border-color); color: #ffffff; box-shadow: var(--shadow-sm);" onclick="closeCustomConfirm(true)">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUPABASE STATUS DETAIL MODAL -->
+  <div id="supabase-dialog" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.65); z-index: 10000; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
+    <div class="modal-card" style="background: var(--card-bg); border: var(--border-width) solid var(--border-color); border-radius: 8px; max-width: 500px; width: 92%; padding: 24px; box-shadow: var(--shadow-lg); color: var(--text-main); position: relative;">
+      <button style="position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 20px; font-weight: bold; cursor: pointer; color: var(--text-main);" onclick="closeSupabaseDialog()">✕</button>
+      <div style="font-size: 32px; margin-bottom: 8px;">⚡</div>
+      <h3 style="font-size: 20px; font-weight: 900; margin-bottom: 12px; text-transform: uppercase; letter-spacing: -0.5px;">Supabase Database Node</h3>
+      
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; background: rgba(0,0,0,0.04); padding: 8px 12px; border-radius: 6px; border: 1.5px solid var(--border-color);">
+        <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%;" id="db-dialog-status-dot"></span>
+        <span id="db-dialog-status-title" style="font-weight: 800; font-size: 14px; text-transform: uppercase;"></span>
+      </div>
+
+      <p id="db-dialog-desc" style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5; font-family: var(--font-sans);"></p>
+      
+      <div id="db-dialog-setup-box" style="display: none; text-align: left; background: #121214; border: 2.5px solid #000; border-radius: 4px; padding: 12px; margin-top: 12px;">
+        <span style="font-family: var(--font-mono); font-size: 11px; color: #a1a1aa; display: block; margin-bottom: 6px;">📋 RUN THIS SQL IN SUPABASE SQL EDITOR:</span>
+        <pre id="db-dialog-sql" style="font-family: var(--font-mono); font-size: 12px; color: #34d399; margin: 0; background: none; border: none; overflow-x: auto; padding: 4px 0;"></pre>
+        <button style="margin-top: 10px; width: 100%; border: 1.5px solid #34d399; background: transparent; color: #34d399; font-weight: 800; font-size: 11px; text-transform: uppercase; padding: 6px; border-radius: 3px; cursor: pointer;" onclick="copySupabaseSql()">Copy SQL Schema Query</button>
+      </div>
+
+      <button class="form-btn form-btn-primary" style="margin-top: 20px; width: 100%;" onclick="closeSupabaseDialog()">Got It</button>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast-notif" id="toast-notif">
+    <span id="toast-icon">✅</span>
+    <span id="toast-text">Changes saved successfully!</span>
+  </div>
+
+  <!-- MAIN SCRIPT -->
+  <script>
+    // --- STABLE SAMPLE DATABASE DATA ---
+    const defaultData = {
+      tournamentName: "Bro Tournament",
+      teams: [],
+      standings: [],
+      scorers: [],
+      fixtures: []
+    };
+
+    // ACTIVE APP DATABASE
+    let tournamentData = { ...defaultData };
+
+    // APPLICATION STATE GLOBALS
+    let selectedTeamId = null;
+    let isAdminAuthenticated = false;
+    let activeAdminTab = "teams"; // 'teams' | 'table' | 'scorers' | 'fixtures'
+    let activeFixtureFilter = "all"; // 'all' | 'upcoming' | 'completed'
+    let uploadedFlagBase64 = ''; // Global Base64 string for uploaded team flag image
+
+    // CLEAR & RESET HELPER UTILITIES
+    function clearInput(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.value = '';
+        if (el.type === 'number') {
+          el.value = '0';
+        }
+      }
+    }
+
+    function resetTeamColor() {
+      document.getElementById('form-team-color').value = '#dc2626';
+      showToast("Color badge reset to default.");
+    }
+
+    function resetScorerTeamSelect() {
+      const sel = document.getElementById('form-scorer-team');
+      if (sel && sel.options.length > 0) {
+        sel.selectedIndex = 0;
+        showToast("Scorer represented team selection reset.");
+      }
+    }
+
+    function clearPlayerInput(i) {
+      const jerseyEl = document.getElementById(`p-jersey-${i}`);
+      const nameEl = document.getElementById(`p-name-${i}`);
+      if (jerseyEl) jerseyEl.value = i;
+      if (nameEl) nameEl.value = '';
+      showToast(`Squad player slot #${i} cleared.`);
+    }
+
+    function clearRowStats(teamId) {
+      const wonEl = document.getElementById(`adm-won-${teamId}`);
+      const lostEl = document.getElementById(`adm-lost-${teamId}`);
+      const drawnEl = document.getElementById(`adm-drawn-${teamId}`);
+      if (wonEl) wonEl.value = '0';
+      if (lostEl) lostEl.value = '0';
+      if (drawnEl) drawnEl.value = '0';
+      recomputeLivePoints(teamId);
+      showToast("Match matrix statistics reset to 0.");
+    }
+
+    // FLAG IMAGERY AND BADGING HELPER FUNCTIONS
+    function getImgSrcFromFlag(flag) {
+      if (!flag) return null;
+      if (flag.startsWith("data:image") || flag.startsWith("http://") || flag.startsWith("https://") || flag.startsWith("/") || flag.includes(".") || flag.startsWith("blob:")) {
+        return flag;
+      }
+      
+      const emojiToRegion = {
+        "🇪🇸": "es",
+        "🇧🇷": "br",
+        "🇦🇷": "ar",
+        "🇫🇷": "fr",
+        "🇩🇪": "de",
+        "🇮🇹": "it",
+        "🇵🇹": "pt",
+        "🏴󠁧󠁢󠁥󠁮󠁧󠁿": "gb-eng",
+        "🇳🇬": "ng",
+        "🇯🇵": "jp",
+        "🇮🇳": "in",
+        "🇺🇸": "us"
+      };
+      
+      const lower = flag.trim().toLowerCase();
+      if (emojiToRegion[flag]) {
+        return `https://flagcdn.com/w160/${emojiToRegion[flag]}.png`;
+      }
+
+      const aliases = {
+        "spain": "es",
+        "sp": "es",
+        "es": "es",
+        "brazil": "br",
+        "br": "br",
+        "argentina": "ar",
+        "ar": "ar",
+        "france": "fr",
+        "fr": "fr",
+        "germany": "de",
+        "de": "de",
+        "italy": "it",
+        "it": "it",
+        "portugal": "pt",
+        "pt": "pt",
+        "england": "gb-eng",
+        "uk": "gb-eng",
+        "nigeria": "ng",
+        "ng": "ng",
+        "japan": "jp",
+        "jp": "jp",
+        "india": "in",
+        "in": "in",
+        "united states": "us",
+        "us": "us",
+        "usa": "us"
+      };
+      if (aliases[lower]) {
+        return `https://flagcdn.com/w160/${aliases[lower]}.png`;
+      }
+
+      return null;
+    }
+
+    function getBadgeHtml(flag, initials, iconSize = "34px") {
+      const imgSrc = getImgSrcFromFlag(flag);
+      if (imgSrc) {
+        return `<img src="${imgSrc}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;" referrerPolicy="no-referrer" />`;
+      }
+      if (flag && flag.trim() !== "") {
+        return `<span style="font-size: ${iconSize}; line-height: 1; display: inline-flex; align-items: center; justify-content: center;">${flag}</span>`;
+      }
+      return `<span style="font-family: var(--font-mono); font-weight: 800; font-size: calc(${iconSize} * 0.55);">${initials}</span>`;
+    }
+
+    function getTableFlagHtml(flag, color, size = "20px") {
+      const imgSrc = getImgSrcFromFlag(flag);
+      if (imgSrc) {
+        return `<span style="width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid #000000; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; margin-right: 8px; flex-shrink: 0; background-color: #fff;"><img src="${imgSrc}" style="width: 100%; height: 100%; object-fit: cover;" referrerPolicy="no-referrer" /></span>`;
+      }
+      if (flag && flag.trim() !== "") {
+        return `<span style="font-size: ${size}; margin-right: 8px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">${flag}</span>`;
+      }
+      return `<span class="standing-dot" style="background-color: ${color}; flex-shrink: 0;"></span>`;
+    }
+
+    function handleFlagImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (file.size > 1024 * 1024) {
+        showToast("Selected image file exceeds 1MB threshold!", "❌");
+        event.target.value = '';
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        uploadedFlagBase64 = e.target.result;
+        const preview = document.getElementById('flag-image-preview');
+        const container = document.getElementById('flag-image-preview-container');
+        preview.innerHTML = `<img src="${uploadedFlagBase64}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" />`;
+        container.style.display = 'flex';
+        showToast("Flag image loaded successfully!", "📸");
+      };
+      reader.onerror = function() {
+        showToast("Error processing file.", "❌");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function deleteUploadedFlag() {
+      uploadedFlagBase64 = '';
+      document.getElementById('form-team-flag-file').value = '';
+      document.getElementById('flag-image-preview').innerHTML = '';
+      document.getElementById('flag-image-preview-container').style.display = 'none';
+      showToast("Uploaded image reference removed.");
+    }
+
+    function handleFlagUrlInput() {
+      const url = document.getElementById('form-team-flag-url').value.trim();
+      const preview = document.getElementById('flag-url-preview');
+      const container = document.getElementById('flag-url-preview-container');
+      
+      if (url) {
+        preview.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" onerror="this.src='https://placehold.co/100x100?text=Error'" />`;
+        container.style.display = 'flex';
+      } else {
+        preview.innerHTML = '';
+        container.style.display = 'none';
+      }
+    }
+
+    function deleteUrlFlag() {
+      document.getElementById('form-team-flag-url').value = '';
+      document.getElementById('flag-url-preview').innerHTML = '';
+      document.getElementById('flag-url-preview-container').style.display = 'none';
+      showToast("Image URL deleted.");
+    }
+
+    function clearFlagInput() {
+      document.getElementById('form-team-flag').value = '⚽';
+      syncCustomFlagInput();
+      showToast("Flag selection reset to Soccer Ball.");
+    }
+
+    // THEME MANAGEMENT (FOOTBALL SWITCH)
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      const isDark = savedTheme === 'dark';
+      document.body.classList.toggle('dark-theme', isDark);
+      
+      const knob = document.getElementById('football-switch-knob');
+      const label = document.getElementById('theme-label');
+      const track = document.querySelector('.football-switch');
+      if (knob) {
+        knob.style.transform = isDark ? 'translateX(22px) rotate(360deg)' : 'translateX(0px) rotate(0deg)';
+      }
+      if (label) {
+        label.innerText = isDark ? 'DARK' : 'LIGHT';
+      }
+      if (track) {
+        track.style.backgroundColor = isDark ? 'var(--secondary)' : '#000000';
+      }
+    }
+
+    function toggleTheme() {
+      const isDark = !document.body.classList.contains('dark-theme');
+      document.body.classList.toggle('dark-theme', isDark);
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      
+      const knob = document.getElementById('football-switch-knob');
+      const label = document.getElementById('theme-label');
+      const track = document.querySelector('.football-switch');
+      if (knob) {
+        knob.style.transform = isDark ? 'translateX(22px) rotate(360deg)' : 'translateX(0px) rotate(0deg)';
+      }
+      if (label) {
+        label.innerText = isDark ? 'DARK' : 'LIGHT';
+      }
+      if (track) {
+        track.style.backgroundColor = isDark ? 'var(--secondary)' : '#000000';
+      }
+      showToast(`Theme changed to ${isDark ? 'Dark' : 'Light'}! ⚽`);
+    }
+
+    // CUSTOM MODAL CONFIRMATION (REPLACES iframe blocked confirm window)
+    let confirmCallback = null;
+
+    function showCustomConfirm(message, callback) {
+      document.getElementById('confirm-msg').innerText = message;
+      confirmCallback = callback;
+      const modal = document.getElementById('confirm-modal');
+      modal.style.display = 'flex';
+      
+      // Slight entry pop accent
+      modal.firstElementChild.style.transform = 'scale(0.96) rotate(-1deg)';
+      setTimeout(() => {
+        modal.firstElementChild.style.transform = 'scale(1) rotate(-0.5deg)';
+        modal.firstElementChild.style.transition = 'all 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.25)';
+      }, 10);
+    }
+
+    function closeCustomConfirm(approved) {
+      document.getElementById('confirm-modal').style.display = 'none';
+      if (approved && confirmCallback) {
+        confirmCallback();
+      }
+      confirmCallback = null;
+    }
+
+    // SUPABASE DATA NETWORK STATUS CHECKERS
+    function checkSupabaseStatus() {
+      fetch('/api/db-status')
+        .then(res => res.json())
+        .then(info => {
+          const dot = document.getElementById('supabase-status-dot');
+          const text = document.getElementById('supabase-status-text');
+          const indicator = document.getElementById('supabase-status-indicator');
+          
+          if (info.connected) {
+            if (dot) dot.style.backgroundColor = '#10b981'; // vibrant green
+            if (text) text.innerText = 'Supabase Active';
+            if (indicator) {
+              indicator.title = "Directly connected to cloud central database node. Click for details.";
+            }
+          } else {
+            if (dot) dot.style.backgroundColor = '#ef4444'; // safety crimson
+            if (text) text.innerText = info.status === 'Schema Missing' ? 'DB Missing Schema' : 'DB Fallback Mode';
+            if (indicator) {
+              animationWobble(indicator);
+              indicator.title = info.message + " Click to initialize schema.";
+            }
+          }
+        })
+        .catch(err => {
+          console.warn("Unable to fetch backend database status state.", err);
+        });
+    }
+
+    function animationWobble(el) {
+      if (!el) return;
+      el.style.transition = 'transform 0.1s';
+      let i = 0;
+      const t = setInterval(() => {
+        el.style.transform = i % 2 === 0 ? 'translateX(2px)' : 'translateX(-2px)';
+        i++;
+        if (i > 6) {
+          clearInterval(t);
+          el.style.transform = 'none';
+        }
+      }, 80);
+    }
+
+    function openSupabaseDialog() {
+      fetch('/api/db-status')
+        .then(res => res.json())
+        .then(info => showSupabaseDetails(info))
+        .catch(err => {
+          showSupabaseDetails({
+            connected: false,
+            status: "Offline",
+            message: "Unable to reach verification status from Express proxy server: " + err.message
+          });
+        });
+    }
+
+    function showSupabaseDetails(info) {
+      document.getElementById('db-dialog-desc').innerText = info.message;
+      const dot = document.getElementById('db-dialog-status-dot');
+      const title = document.getElementById('db-dialog-status-title');
+      const setupBox = document.getElementById('db-dialog-setup-box');
+      
+      if (info.connected) {
+        dot.style.backgroundColor = '#10b981';
+        title.innerText = `Online - ${info.status}`;
+        setupBox.style.display = 'none';
+      } else {
+        dot.style.backgroundColor = '#ef4444';
+        title.innerText = `Action Required - ${info.status}`;
+        if (info.sql) {
+          document.getElementById('db-dialog-sql').innerText = info.sql;
+          setupBox.style.display = 'block';
+        } else {
+          setupBox.style.display = 'none';
+        }
+      }
+      document.getElementById('supabase-dialog').style.display = 'flex';
+    }
+
+    function closeSupabaseDialog() {
+      document.getElementById('supabase-dialog').style.display = 'none';
+    }
+
+    function copySupabaseSql() {
+      const sqlNode = document.getElementById('db-dialog-sql');
+      navigator.clipboard.writeText(sqlNode.innerText)
+        .then(() => showToast("SQL Table Schema copied!", "📋"))
+        .catch(() => showToast("Auto-copy failed. Please select and copy.", "❌"));
+    }
+
+    // INITIALIZATION RUNTIME
+    window.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      loadDatabase();
+      generatePlayerFormRows();
+      checkSupabaseStatus();
+      
+      // Start real-time background sync so all active browser clients receive automatic updates instantly
+      setInterval(() => {
+        loadDatabase(true);
+      }, 3000);
+    });
+
+    // LOAD & SAVE DATABASE UTILITIES
+    function loadDatabase(isPeriodic = false) {
+      fetch('/api/data')
+        .then(res => {
+          if (!res.ok) throw new Error("HTTP error " + res.status);
+          return res.json();
+        })
+        .then(data => {
+          let newData = data && Array.isArray(data.teams) ? data : defaultData;
+          newData.fixtures = newData.fixtures || [];
+          newData.scorers = newData.scorers || [];
+          newData.standings = newData.standings || [];
+          
+          // Check if data actually changed to avoid redundant layout updates
+          const dataChanged = JSON.stringify(tournamentData) !== JSON.stringify(newData);
+          if (dataChanged) {
+            tournamentData = newData;
+            
+            // Re-render user views
+            renderTeamsView();
+            renderStandingsView();
+            renderScorersView();
+            renderFixturesView();
+            
+            // Re-render admin controls ONLY if no active edit fields are being typed
+            const isEditingTeam = document.getElementById('edit-team-id') && document.getElementById('edit-team-id').value !== '';
+            const isEditingScorer = document.getElementById('edit-scorer-index') && document.getElementById('edit-scorer-index').value !== '';
+            const isEditingFixture = document.getElementById('edit-fixture-id') && document.getElementById('edit-fixture-id').value !== '';
+            
+            if (!isEditingTeam && !isEditingScorer && !isEditingFixture) {
+              renderAdminTeams();
+              renderAdminStandings();
+              renderAdminScorers();
+              renderAdminFixtures();
+            }
+          }
+          
+          // Sync tournament header elements
+          const displayTitle = document.getElementById('display-tournament-title');
+          if (displayTitle) {
+            displayTitle.innerText = tournamentData.tournamentName;
+          }
+          
+          const teamCount = tournamentData.teams ? tournamentData.teams.length : 0;
+          const matchCount = tournamentData.standings ? tournamentData.standings.reduce((sum, s) => sum + s.won + s.lost + s.drawn, 0) / 2 : 0;
+          const subtitle = document.getElementById('display-tournament-subtitle');
+          if (subtitle) {
+            subtitle.innerText = `${teamCount} Teams · ${Math.round(matchCount)} Matches Played · 1 Champion`;
+          }
+        })
+        .catch(e => {
+          console.warn("Unable to fetch backend database, falling back to local simulation.", e);
+          if (!isPeriodic) {
+            const stored = localStorage.getItem("btototype_cup_db");
+            if (stored) {
+              try {
+                tournamentData = JSON.parse(stored);
+              } catch (err) {
+                tournamentData = { ...defaultData };
+              }
+            } else {
+              tournamentData = { ...defaultData };
+            }
+            tournamentData.fixtures = tournamentData.fixtures || [];
+            tournamentData.scorers = tournamentData.scorers || [];
+            tournamentData.standings = tournamentData.standings || [];
+            renderAllViews();
+          }
+        });
+    }
+
+    function saveDatabase() {
+      // Immediate fallback persistence locally
+      localStorage.setItem("btototype_cup_db", JSON.stringify(tournamentData));
+      
+      // Post database payload back to standard Express endpoint
+      fetch('/api/data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(tournamentData)
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Database posting failed " + res.status);
+        return res.json();
+      })
+      .then(() => {
+        console.log("Database successfully published to shared cloud node.");
+        
+        // Sync dynamic subtitle stats
+        const teamCount = tournamentData.teams ? tournamentData.teams.length : 0;
+        const matchCount = tournamentData.standings ? tournamentData.standings.reduce((sum, s) => sum + s.won + s.lost + s.drawn, 0) / 2 : 0;
+        const subtitle = document.getElementById('display-tournament-subtitle');
+        if (subtitle) {
+          subtitle.innerText = `${teamCount} Teams · ${Math.round(matchCount)} Matches Played · 1 Champion`;
+        }
+      })
+      .catch(err => {
+        console.error("Cloud synchronization mismatch error:", err);
+      });
+    }
+
+    function syncCustomFlagInput() {
+      const select = document.getElementById('form-team-flag');
+      const customInput = document.getElementById('form-team-flag-custom');
+      
+      if (customInput) {
+        if (select.value === 'custom') {
+          customInput.style.display = 'block';
+          customInput.focus();
+        } else {
+          customInput.style.display = 'none';
+        }
+      }
+    }
+
+    // SHARED RE-RENDERING PIPELINE
+    function renderAllViews() {
+      renderTeamsView();
+      renderStandingsView();
+      renderScorersView();
+      renderFixturesView();
+      
+      // Admin dashboard renderers
+      renderAdminTeams();
+      renderAdminStandings();
+      renderAdminScorers();
+      renderAdminFixtures();
+    }
+
+    // TOAST NOTIFICATIONS HELPER
+    function showToast(text, icon = "✅") {
+      const toast = document.getElementById('toast-notif');
+      document.getElementById('toast-icon').innerText = icon;
+      document.getElementById('toast-text').innerText = text;
+      
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3500);
+    }
+
+    // SINGLE PAGE APP ROUTING TRANSITIONS
+    function navigate(pageId) {
+      // Manage mobile nav closing implicitly
+      document.getElementById('mobile-nav-menu').classList.remove('open');
+      
+      // Desktop link styles active transition
+      const navBtns = document.querySelectorAll('nav.desktop-nav .nav-btn');
+      navBtns.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('onclick').includes(`'${pageId}'`)) {
+          btn.classList.add('active');
+        }
+      });
+
+      // Show/Hide pages with smooth transitions
+      const pages = document.querySelectorAll('.page-section');
+      pages.forEach(page => {
+        page.classList.remove('active');
+        page.style.display = "none";
+      });
+
+      const target = document.getElementById(`page-${pageId}`);
+      if (target) {
+        target.style.display = "block";
+        // Force rendering paint flash for transition trigger
+        target.offsetHeight; 
+        target.classList.add('active');
+      }
+
+      // If page is Select Team, hide player list subview by default
+      if (pageId === 'teams') {
+        hidePlayerList();
+      }
+    }
+
+    function toggleMobileNav() {
+      document.getElementById('mobile-nav-menu').classList.toggle('open');
+    }
+
+    function navigateMobile(pageId) {
+      toggleMobileNav();
+      navigate(pageId);
+    }
+
+    // --- VIEW GENERATOR: TEAMS (GRID & PLAYER ROSTER) ---
+    function renderTeamsView() {
+      const container = document.getElementById('teams-grid-container');
+      container.innerHTML = '';
+
+      tournamentData.teams.forEach(team => {
+        const initials = team.name.split(" ").map(w => w[0]).join("").substring(0,2).toUpperCase();
+        const badgeContent = getBadgeHtml(team.flag, initials, "34px");
+        const playerCount = team.players ? team.players.length : 0;
+
+        const card = document.createElement('div');
+        card.className = 'team-card animate-fade';
+        card.id = `public-team-card-${team.id}`;
+        card.onclick = () => showTeamPlayers(team.id);
+
+        card.innerHTML = `
+          <div class="team-badge-circle" style="background-color: ${team.color || '#0a5c36'}">
+            ${badgeContent}
+          </div>
+          <h3 class="team-card-name">${team.name}</h3>
+          <p class="team-card-meta">${playerCount} Squad Players</p>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function showTeamPlayers(teamId) {
+      selectedTeamId = teamId;
+      const team = tournamentData.teams.find(t => t.id === teamId);
+      if (!team) return;
+
+      const initials = team.name.split(" ").map(w => w[0]).join("").substring(0,2).toUpperCase();
+      const badgeContent = getBadgeHtml(team.flag, initials, "24px");
+      
+      // Populate sub view details
+      document.getElementById('detail-team-badge').innerHTML = badgeContent;
+      document.getElementById('detail-team-badge').style.backgroundColor = team.color || '#0a5c36';
+      document.getElementById('detail-team-name').innerText = team.name;
+
+      const tbody = document.getElementById('detail-players-body');
+      tbody.innerHTML = '';
+
+      if (!team.players || team.players.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color: var(--text-muted)">No squad members registered</td></tr>`;
+      } else {
+        team.players.forEach(p => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td class="jersey-col">#${p.number}</td>
+            <td style="font-weight: 500;">${p.name}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      }
+
+      // Smooth slide-up team list view
+      const cardsGrid = document.getElementById('teams-grid-container');
+      cardsGrid.style.display = 'none';
+
+      const detailSection = document.getElementById('team-detail-container');
+      detailSection.style.display = 'block';
+      detailSection.offsetHeight;
+      detailSection.classList.add('show');
+    }
+
+    function hidePlayerList() {
+      selectedTeamId = null;
+      const detailSection = document.getElementById('team-detail-container');
+      detailSection.classList.remove('show');
+      detailSection.style.display = 'none';
+
+      const cardsGrid = document.getElementById('teams-grid-container');
+      cardsGrid.style.display = 'grid';
+    }
+
+
+    // --- VIEW GENERATOR: TOURNAMENT TABLES ---
+    function renderStandingsView() {
+      const tbody = document.getElementById('public-standings-body');
+      tbody.innerHTML = '';
+
+      // Compute points and package with metadata
+      const standingMatrix = tournamentData.standings.map(s => {
+        const teamObj = tournamentData.teams.find(t => t.id === s.teamId);
+        const played = s.won + s.lost + s.drawn;
+        const pts = (s.won * 3) + (s.drawn * 1);
+        return {
+          ...s,
+          teamName: teamObj ? teamObj.name : 'Unknown Team',
+          teamColor: teamObj ? teamObj.color : '#6b7280',
+          teamFlag: teamObj ? teamObj.flag : '',
+          played,
+          points: pts
+        };
+      });
+
+      // Sort by points descending, fallback to team name alphabetical
+      standingMatrix.sort((a,b) => {
+        if (b.points !== a.points) return b.points - a.points;
+        return a.teamName.localeCompare(b.teamName);
+      });
+
+      standingMatrix.forEach((teamRes, idx) => {
+        const rank = idx + 1;
+        const isTop = rank === 1;
+        
+        const row = document.createElement('tr');
+        if (isTop) {
+          row.className = 'top-standing-row';
+        }
+
+        row.innerHTML = `
+          <td class="standing-rank">${isTop ? '🏆' : rank}</td>
+          <td>
+            <div class="standing-team">
+              ${getTableFlagHtml(teamRes.teamFlag, teamRes.teamColor, "20px")}
+              <span>${teamRes.teamName}</span>
+            </div>
+          </td>
+          <td class="center-score">${teamRes.played}</td>
+          <td class="center-score font-semibold" style="color: var(--success);">${teamRes.won}</td>
+          <td class="center-score font-semibold" style="color: var(--danger);">${teamRes.lost}</td>
+          <td class="center-score font-semibold" style="color: var(--text-muted);">${teamRes.drawn}</td>
+          <td class="center-score points-col">${teamRes.points}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+
+    // --- VIEW GENERATOR: SCORERS LEADERBOARD ---
+    function renderScorersView() {
+      const tbody = document.getElementById('public-scorers-body');
+      tbody.innerHTML = '';
+
+      // Map scorers with team metadata
+      const decoratedScorers = tournamentData.scorers.map(sc => {
+        const teamObj = tournamentData.teams.find(t => t.id === sc.teamId);
+        return {
+          ...sc,
+          teamName: teamObj ? teamObj.name : 'Unknown Team',
+          teamColor: teamObj ? teamObj.color : '#6b7280',
+          teamFlag: teamObj ? teamObj.flag : ''
+        };
+      });
+
+      // Sort by goals descending
+      decoratedScorers.sort((a,b) => b.goals - a.goals);
+
+      if (decoratedScorers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 32px; color: var(--text-muted)">No goals recorded yet. Keep building up matches!</td></tr>`;
+        return;
+      }
+
+      decoratedScorers.forEach((scorer, idx) => {
+        const rank = idx + 1;
+        let badge = rank;
+        if (rank === 1) badge = '🥇';
+        else if (rank === 2) badge = '🥈';
+        else if (rank === 3) badge = '🥉';
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="standing-rank scorers-rank-badge">${badge}</td>
+          <td style="font-weight: 700; color: var(--text-main);">${scorer.playerName}</td>
+          <td>
+            <div class="standing-team">
+              ${getTableFlagHtml(scorer.teamFlag, scorer.teamColor, "20px")}
+              <span>${scorer.teamName}</span>
+            </div>
+          </td>
+          <td class="scorer-goals">${scorer.goals} Goals</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+
+    // ==========================================
+    // =          ADMIN CONTROL FLOWS           =
+    // ==========================================
+
+    function openLoginModal() {
+      document.getElementById('admin-password').value = '';
+      document.getElementById('login-error-msg').style.display = 'none';
+      document.getElementById('login-modal').classList.add('open');
+      document.getElementById('admin-password').focus();
+    }
+
+    function closeLoginModal() {
+      document.getElementById('login-modal').classList.remove('open');
+    }
+
+    function closeLoginModalOnOutsideClick(err) {
+      if (err.target.id === 'login-modal') {
+        closeLoginModal();
+      }
+    }
+
+    function handleLoginSubmit(event) {
+      event.preventDefault();
+      const pwInput = document.getElementById('admin-password').value;
+      
+      if (pwInput === 'Sonumeenu@2') {
+        closeLoginModal();
+        isAdminAuthenticated = true;
+        showAdminPanel();
+        showToast("Authenticated successfully. Welcome Admin!", "⚙");
+      } else {
+        document.getElementById('login-error-msg').style.display = 'block';
+        document.getElementById('login-error-msg').focus();
+      }
+    }
+
+    function showAdminPanel() {
+      const panel = document.getElementById('admin-panel');
+      panel.style.display = 'flex';
+      panel.offsetHeight;
+      panel.classList.add('visible');
+      
+      // Pre-run dashboard tabs population
+      renderAllViews();
+      switchAdminTab('teams');
+    }
+
+    function logoutAdmin() {
+      isAdminAuthenticated = false;
+      const panel = document.getElementById('admin-panel');
+      panel.classList.remove('visible');
+      setTimeout(() => {
+        panel.style.display = 'none';
+      }, 300);
+      showToast("Logged out of session.", "🔒");
+    }
+
+    function switchAdminTab(tabName) {
+      activeAdminTab = tabName;
+      
+      // Update Tab strip active triggers
+      const tabs = ['teams', 'table', 'scorers', 'fixtures'];
+      tabs.forEach(tab => {
+        const btn = document.getElementById(`tab-btn-${tab}`);
+        const content = document.getElementById(`admin-tab-${tab}`);
+        
+        if (tab === tabName) {
+          btn.classList.add('active');
+          content.classList.add('active');
+        } else {
+          if (btn) btn.classList.remove('active');
+          if (content) content.classList.remove('active');
+        }
+      });
+
+      // Specific triggers
+      if (tabName === 'scorers') {
+        populateTeamDropdown();
+      }
+      if (tabName === 'fixtures') {
+        populateFixtureTeamDropdowns();
+      }
+    }
+
+
+    // --- TAB 1: TEAMS ADMIN EDIT CONTROLS ---
+
+    function generatePlayerFormRows() {
+      const parent = document.getElementById('players-input-list');
+      parent.innerHTML = '';
+      
+      for (let i = 1; i <= 11; i++) {
+        const row = document.createElement('div');
+        row.className = 'player-row-input';
+        row.innerHTML = `
+          <input type="number" id="p-jersey-${i}" class="form-input" placeholder="${i}" min="1" value="${i}" />
+          <input type="text" id="p-name-${i}" class="form-input" placeholder="Player Name" />
+          <button type="button" class="btn-delete-input" onclick="clearPlayerInput(${i})" title="Clear Player row">✕</button>
+        `;
+        parent.appendChild(row);
+      }
+    }
+
+    function renderAdminTeams() {
+      const root = document.getElementById('admin-teams-list');
+      root.innerHTML = '';
+
+      if (tournamentData.teams.length === 0) {
+        root.innerHTML = `<div style="text-align:center; padding: 24px; color: var(--text-muted)">No teams in the database. Add one below!</div>`;
+        return;
+      }
+
+      tournamentData.teams.forEach(team => {
+        const initials = team.name.split(" ").map(w => w[0]).join("").substring(0,2).toUpperCase();
+        const badgeContent = getBadgeHtml(team.flag, initials, "18px");
+        const playerCount = team.players ? team.players.length : 0;
+
+        const row = document.createElement('div');
+        row.className = 'admin-list-item';
+        row.innerHTML = `
+          <div class="admin-list-info">
+            <div class="admin-badge-preview" style="background-color: ${team.color || '#0a5c36'}; width: 40px; height: 40px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1.5px solid #000000; box-shadow: 1.5px 1.5px 0px #000000;">${badgeContent}</div>
+            <div>
+              <div class="admin-list-title">${team.name}</div>
+              <div class="admin-list-subtitle">${playerCount} squad members</div>
+            </div>
+          </div>
+          <div class="admin-list-actions">
+            <button class="action-btn action-btn-edit" onclick="initiateEditTeam(${team.id})">✏️ Edit</button>
+            <button class="action-btn action-btn-delete" onclick="deleteTeam(${team.id})">🗑️ Delete</button>
+          </div>
+        `;
+        root.appendChild(row);
+      });
+    }
+
+    function handleTeamFormSubmit(e) {
+      e.preventDefault();
+      const teamIdField = document.getElementById('edit-team-id').value;
+      const teamName = document.getElementById('form-team-name').value.trim();
+      const teamColor = document.getElementById('form-team-color').value;
+
+      // Extract raw flag options (supports direct upload, URL, custom emoji, or predefined emoji)
+      let teamFlag = '⚽';
+      const flagUrl = document.getElementById('form-team-flag-url').value.trim();
+      const flagSelectVal = document.getElementById('form-team-flag').value;
+      
+      if (uploadedFlagBase64) {
+        teamFlag = uploadedFlagBase64;
+      } else if (flagUrl) {
+        teamFlag = flagUrl;
+      } else if (flagSelectVal === 'custom') {
+        teamFlag = document.getElementById('form-team-flag-custom').value.trim();
+      } else {
+        teamFlag = flagSelectVal;
+      }
+
+      if (!teamFlag) teamFlag = '⚽';
+
+      // Bundle up to 11 players
+      const parsedPlayers = [];
+      for (let i = 1; i <= 11; i++) {
+        const num = parseInt(document.getElementById(`p-jersey-${i}`).value);
+        const name = document.getElementById(`p-name-${i}`).value.trim();
+        if (name) {
+          parsedPlayers.push({
+            number: isNaN(num) ? i : num,
+            name
+          });
+        }
+      }
+
+      if (teamIdField) {
+        // --- EDITING EXISTING TEAM ---
+        const tId = parseInt(teamIdField);
+        const idx = tournamentData.teams.findIndex(t => t.id === tId);
+        if (idx !== -1) {
+          tournamentData.teams[idx].name = teamName;
+          tournamentData.teams[idx].color = teamColor;
+          tournamentData.teams[idx].flag = teamFlag;
+          tournamentData.teams[idx].players = parsedPlayers;
+          showToast("Saved squad team settings!");
+        }
+      } else {
+        // --- ADDING NEW TEAM ---
+        const nextId = tournamentData.teams.length > 0 
+          ? Math.max(...tournamentData.teams.map(t => t.id)) + 1 
+          : 1;
+
+        tournamentData.teams.push({
+          id: nextId,
+          name: teamName,
+          color: teamColor,
+          flag: teamFlag,
+          players: parsedPlayers
+        });
+
+        // Initialize corresponding standings row
+        tournamentData.standings.push({
+          teamId: nextId,
+          won: 0,
+          lost: 0,
+          drawn: 0
+        });
+
+        showToast("Created team and squad roster!");
+      }
+
+      // Reset Form State
+      cancelTeamEdit();
+      saveDatabase();
+      renderAllViews();
+    }
+
+    function initiateEditTeam(teamId) {
+      const team = tournamentData.teams.find(t => t.id === teamId);
+      if (!team) return;
+
+      document.getElementById('edit-team-id').value = team.id;
+      document.getElementById('form-team-name').value = team.name;
+      document.getElementById('form-team-color').value = team.color || '#dc2626';
+
+      // Load flag values (with support for Base64 and remote URLs)
+      const flagSelect = document.getElementById('form-team-flag');
+      const customFlagInput = document.getElementById('form-team-flag-custom');
+      
+      // Clear previews first
+      uploadedFlagBase64 = '';
+      document.getElementById('form-team-flag-file').value = '';
+      document.getElementById('flag-image-preview').innerHTML = '';
+      document.getElementById('flag-image-preview-container').style.display = 'none';
+      
+      document.getElementById('form-team-flag-url').value = '';
+      document.getElementById('flag-url-preview').innerHTML = '';
+      document.getElementById('flag-url-preview-container').style.display = 'none';
+
+      if (team.flag) {
+        if (team.flag.startsWith("data:image")) {
+          uploadedFlagBase64 = team.flag;
+          const preview = document.getElementById('flag-image-preview');
+          const container = document.getElementById('flag-image-preview-container');
+          if (preview && container) {
+            preview.innerHTML = `<img src="${team.flag}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" />`;
+            container.style.display = 'flex';
+          }
+          flagSelect.value = '⚽';
+        } else if (team.flag.startsWith("http://") || team.flag.startsWith("https://")) {
+          document.getElementById('form-team-flag-url').value = team.flag;
+          const preview = document.getElementById('flag-url-preview');
+          const container = document.getElementById('flag-url-preview-container');
+          if (preview && container) {
+            preview.innerHTML = `<img src="${team.flag}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" />`;
+            container.style.display = 'flex';
+          }
+          flagSelect.value = '⚽';
+        } else {
+          const knownOptions = Array.from(flagSelect.options).map(opt => opt.value);
+          if (knownOptions.includes(team.flag)) {
+            flagSelect.value = team.flag;
+          } else {
+            flagSelect.value = 'custom';
+            if (customFlagInput) customFlagInput.value = team.flag;
+          }
+        }
+      } else {
+        flagSelect.value = '⚽';
+      }
+      
+      syncCustomFlagInput();
+
+      // Load up to 11 players
+      for (let i = 1; i <= 11; i++) {
+        const pField = team.players && team.players[i-1];
+        if (pField) {
+          document.getElementById(`p-jersey-${i}`).value = pField.number;
+          document.getElementById(`p-name-${i}`).value = pField.name;
+        } else {
+          document.getElementById(`p-jersey-${i}`).value = i;
+          document.getElementById(`p-name-${i}`).value = '';
+        }
+      }
+
+      document.getElementById('team-form-title').innerText = "Edit Squad Roster";
+      document.getElementById('team-submit-btn').innerText = "Save Team Updates";
+      document.getElementById('team-submit-btn').style.backgroundColor = "var(--success)";
+      document.getElementById('team-cancel-btn').style.display = "block";
+
+      // Scroll form to top view
+      document.getElementById('team-edit-form').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function cancelTeamEdit() {
+      document.getElementById('edit-team-id').value = '';
+      document.getElementById('form-team-name').value = '';
+      document.getElementById('form-team-color').value = '#dc2626';
+
+      // Reset Flag Input Fields
+      document.getElementById('form-team-flag').value = '⚽';
+      document.getElementById('form-team-flag-custom').value = '';
+      
+      uploadedFlagBase64 = '';
+      document.getElementById('form-team-flag-file').value = '';
+      document.getElementById('flag-image-preview').innerHTML = '';
+      document.getElementById('flag-image-preview-container').style.display = 'none';
+      
+      document.getElementById('form-team-flag-url').value = '';
+      document.getElementById('flag-url-preview').innerHTML = '';
+      document.getElementById('flag-url-preview-container').style.display = 'none';
+
+      syncCustomFlagInput();
+      
+      // Clear inputs
+      for (let i = 1; i <= 11; i++) {
+        document.getElementById(`p-jersey-${i}`).value = i;
+        document.getElementById(`p-name-${i}`).value = '';
+      }
+
+      document.getElementById('team-form-title').innerText = "Add New Team";
+      document.getElementById('team-submit-btn').innerText = "Add Team";
+      document.getElementById('team-submit-btn').style.backgroundColor = "var(--admin)";
+      document.getElementById('team-cancel-btn').style.display = "none";
+    }
+
+    function deleteTeam(teamId) {
+      const team = tournamentData.teams.find(t => t.id === teamId);
+      if (!team) return;
+
+      showCustomConfirm(`Are you absolutely sure you want to delete "${team.name}"? This will purge all standings statistics & representing goal scorer links.`, () => {
+        // Remove from Teams
+        tournamentData.teams = tournamentData.teams.filter(t => t.id !== teamId);
+        // Remove from Standings
+        tournamentData.standings = tournamentData.standings.filter(s => s.teamId !== teamId);
+        // Remove or nullify team referential link in Scorers
+        tournamentData.scorers = tournamentData.scorers.filter(sc => sc.teamId !== teamId);
+
+        showToast("Purged team from database.", "🗑️");
+        
+        cancelTeamEdit();
+        saveDatabase();
+        renderAllViews();
+      });
+    }
+
+
+    // --- TAB 2: STANDINGS PANEL SETTINGS ---
+
+    function renderAdminStandings() {
+      const root = document.getElementById('admin-standings-list');
+      root.innerHTML = '';
+
+      tournamentData.standings.forEach(st => {
+        const teamObj = tournamentData.teams.find(t => t.id === st.teamId);
+        const name = teamObj ? teamObj.name : 'Unknown';
+        const pts = (st.won * 3) + (st.drawn * 1);
+
+        const container = document.createElement('div');
+        container.className = 'admin-table-item';
+        container.innerHTML = `
+          <span class="team-name">${name}</span>
+          <input type="number" id="adm-won-${st.teamId}" min="0" value="${st.won}" oninput="recomputeLivePoints(${st.teamId})" />
+          <input type="number" id="adm-lost-${st.teamId}" min="0" value="${st.lost}" oninput="recomputeLivePoints(${st.teamId})" />
+          <input type="number" id="adm-drawn-${st.teamId}" min="0" value="${st.drawn}" oninput="recomputeLivePoints(${st.teamId})" />
+          <span class="admin-computed-pts" id="live-pts-${st.teamId}">${pts}</span>
+          <button type="button" class="btn-clear-table-row" onclick="clearRowStats(${st.teamId})" title="Reset to 0">✕</button>
+        `;
+        root.appendChild(container);
+      });
+    }
+
+    function recomputeLivePoints(teamId) {
+      const wVal = parseInt(document.getElementById(`adm-won-${teamId}`).value) || 0;
+      const dVal = parseInt(document.getElementById(`adm-drawn-${teamId}`).value) || 0;
+      const sumPts = (wVal * 3) + dVal;
+      document.getElementById(`live-pts-${teamId}`).innerText = sumPts;
+    }
+
+    function saveAdminStandings() {
+      tournamentData.standings.forEach(st => {
+        const wVal = parseInt(document.getElementById(`adm-won-${st.teamId}`).value);
+        const lVal = parseInt(document.getElementById(`adm-lost-${st.teamId}`).value);
+        const dVal = parseInt(document.getElementById(`adm-drawn-${st.teamId}`).value);
+
+        st.won = isNaN(wVal) ? 0 : wVal;
+        st.lost = isNaN(lVal) ? 0 : lVal;
+        st.drawn = isNaN(dVal) ? 0 : dVal;
+      });
+
+      showToast("✅ Standings updated!");
+      saveDatabase();
+      renderAllViews();
+    }
+
+
+    // --- TAB 3: SCORERS LEADERBOARD SETUP ---
+
+    function populateTeamDropdown() {
+      const select = document.getElementById('form-scorer-team');
+      select.innerHTML = '<option value="" disabled selected>Choose Team</option>';
+
+      tournamentData.teams.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t.id;
+        opt.innerText = t.name;
+        select.appendChild(opt);
+      });
+    }
+
+    function renderAdminScorers() {
+      const root = document.getElementById('admin-scorers-list');
+      root.innerHTML = '';
+
+      if (tournamentData.scorers.length === 0) {
+        root.innerHTML = `<div style="text-align:center; padding: 24px; color: var(--text-muted)">No strikers registered yet. Use form on the left!</div>`;
+        return;
+      }
+
+      tournamentData.scorers.forEach((sc, idx) => {
+        const teamObj = tournamentData.teams.find(t => t.id === sc.teamId);
+        const tName = teamObj ? teamObj.name : 'Unknown';
+
+        const row = document.createElement('div');
+        row.className = 'admin-list-item';
+        row.innerHTML = `
+          <div class="admin-list-info">
+            <span style="font-size: 20px;">⚽</span>
+            <div>
+              <div class="admin-list-title">${sc.playerName} (${sc.goals} Goals)</div>
+              <div class="admin-list-subtitle">Squad: ${tName}</div>
+            </div>
+          </div>
+          <div class="admin-list-actions">
+            <button class="action-btn action-btn-edit" onclick="initiateEditScorer(${idx})">✏️ Edit</button>
+            <button class="action-btn action-btn-delete" onclick="deleteScorer(${idx})">🗑️ Delete</button>
+          </div>
+        `;
+        root.appendChild(row);
+      });
+    }
+
+    function handleScorerFormSubmit(e) {
+      e.preventDefault();
+      const indexField = document.getElementById('edit-scorer-index').value;
+      const name = document.getElementById('form-scorer-name').value.trim();
+      const teamId = parseInt(document.getElementById('form-scorer-team').value);
+      const goals = parseInt(document.getElementById('form-scorer-goals').value) || 0;
+
+      if (indexField !== "") {
+        // --- EDITING ENTRY ---
+        const idx = parseInt(indexField);
+        if (tournamentData.scorers[idx]) {
+          tournamentData.scorers[idx] = { playerName: name, teamId, goals };
+          showToast("Saved scorer updates!");
+        }
+      } else {
+        // --- ADDING ENTRY ---
+        tournamentData.scorers.push({ playerName: name, teamId, goals });
+        showToast("Added new goal striker entry!");
+      }
+
+      cancelScorerEdit();
+      saveDatabase();
+      renderAllViews();
+    }
+
+    function initiateEditScorer(index) {
+      const sc = tournamentData.scorers[index];
+      if (!sc) return;
+
+      populateTeamDropdown(); // Make sure populated
+
+      document.getElementById('edit-scorer-index').value = index;
+      document.getElementById('form-scorer-name').value = sc.playerName;
+      document.getElementById('form-scorer-team').value = sc.teamId;
+      document.getElementById('form-scorer-goals').value = sc.goals;
+
+      document.getElementById('scorer-form-title').innerText = "Edit Striker Entry";
+      document.getElementById('scorer-submit-btn').innerText = "Save Goals Record";
+      document.getElementById('scorer-submit-btn').style.backgroundColor = "var(--success)";
+      document.getElementById('scorer-cancel-btn').style.display = "block";
+
+      // Scroll form to view
+      document.getElementById('scorer-edit-form').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function cancelScorerEdit() {
+      document.getElementById('edit-scorer-index').value = '';
+      document.getElementById('form-scorer-name').value = '';
+      document.getElementById('form-scorer-team').value = '';
+      document.getElementById('form-scorer-goals').value = '';
+
+      document.getElementById('scorer-form-title').innerText = "Add Golden Boot Entry";
+      document.getElementById('scorer-submit-btn').innerText = "Add Scorer";
+      document.getElementById('scorer-submit-btn').style.backgroundColor = "var(--admin)";
+      document.getElementById('scorer-cancel-btn').style.display = "none";
+    }
+
+    function deleteScorer(index) {
+      const sc = tournamentData.scorers[index];
+      if (!sc) return;
+
+      showCustomConfirm(`Do you want to delete ${sc.playerName}'s goals record?`, () => {
+        tournamentData.scorers.splice(index, 1);
+        showToast("Purged scorer entry.", "🗑️");
+
+        cancelScorerEdit();
+        saveDatabase();
+        renderAllViews();
+      });
+    }
+
+    // --- TAB 4: FIXTURES ADMINISTRATION & VIEWS ---
+
+    function populateFixtureTeamDropdowns() {
+      const homeSelect = document.getElementById('form-fixture-home');
+      const awaySelect = document.getElementById('form-fixture-away');
+      if (!homeSelect || !awaySelect) return;
+
+      const homeVal = homeSelect.value;
+      const awayVal = awaySelect.value;
+
+      homeSelect.innerHTML = '<option value="" disabled selected>Choose Team 1</option>';
+      awaySelect.innerHTML = '<option value="" disabled selected>Choose Team 2</option>';
+
+      tournamentData.teams.forEach(t => {
+        const optHome = document.createElement('option');
+        optHome.value = t.id;
+        optHome.innerText = t.name;
+        homeSelect.appendChild(optHome);
+
+        const optAway = document.createElement('option');
+        optAway.value = t.id;
+        optAway.innerText = t.name;
+        awaySelect.appendChild(optAway);
+      });
+
+      if (homeVal) homeSelect.value = homeVal;
+      if (awayVal) awaySelect.value = awayVal;
+    }
+
+    function renderFixturesView() {
+      const list = document.getElementById('public-fixtures-list');
+      if (!list) return;
+      list.innerHTML = '';
+
+      // Filter fixtures
+      let filtered = tournamentData.fixtures || [];
+      if (activeFixtureFilter === 'upcoming') {
+        filtered = filtered.filter(f => f.status === 'upcoming' || f.status === 'live');
+      } else if (activeFixtureFilter === 'completed') {
+        filtered = filtered.filter(f => f.status === 'completed');
+      }
+
+      if (filtered.length === 0) {
+        list.innerHTML = `<div style="text-align:center; padding: 48px; color: var(--text-muted); font-weight: 600; border: var(--border-width) dashed #000000; border-radius: var(--radius); background-color: var(--card-bg);">No matches found matching filter.</div>`;
+        return;
+      }
+
+      // Sort by date and time
+      filtered.sort((a, b) => {
+        const dateA = a.date || '9999-12-31';
+        const timeA = a.time || '23:59';
+        const dateB = b.date || '9999-12-31';
+        const timeB = b.time || '23:59';
+        const dateTimeA = new Date(`${dateA}T${timeA}`);
+        const dateTimeB = new Date(`${dateB}T${timeB}`);
+        return dateTimeA - dateTimeB;
+      });
+
+      filtered.forEach(f => {
+        const homeTeam = tournamentData.teams.find(t => t.id === f.homeTeamId);
+        const awayTeam = tournamentData.teams.find(t => t.id === f.awayTeamId);
+        const homeName = homeTeam ? homeTeam.name : 'Unknown';
+        const awayName = awayTeam ? awayTeam.name : 'Unknown';
+        
+        const homeInitials = homeName.split(" ").map(w => w[0]).join("").substring(0,2).toUpperCase();
+        const awayInitials = awayName.split(" ").map(w => w[0]).join("").substring(0,2).toUpperCase();
+        
+        const homeBadge = getBadgeHtml(homeTeam ? homeTeam.flag : '', homeInitials, "20px");
+        const awayBadge = getBadgeHtml(awayTeam ? awayTeam.flag : '', awayInitials, "20px");
+        
+        const homeColor = homeTeam ? homeTeam.color : '#0a5c36';
+        const awayColor = awayTeam ? awayTeam.color : '#0a5c36';
+
+        const card = document.createElement('div');
+        card.className = 'fixture-card animate-fade';
+        
+        let statusBadgeClass = f.status;
+        let statusText = f.status === 'upcoming' ? 'Scheduled' : f.status === 'completed' ? 'Full Time' : 'Live Now 🔴';
+        
+        let scoreOrVsHtml = '';
+        if (f.status === 'upcoming') {
+          scoreOrVsHtml = `<div class="fixture-vs-badge">VS</div>`;
+        } else {
+          const isHomeWinner = f.status === 'completed' && f.homeScore > f.awayScore;
+          const isAwayWinner = f.status === 'completed' && f.awayScore > f.homeScore;
+          scoreOrVsHtml = `
+            <div class="fixture-scores">
+              <span class="fixture-score-item">${f.homeScore}</span>
+              <span>-</span>
+              <span class="fixture-score-item">${f.awayScore}</span>
+            </div>
+            ${isHomeWinner ? '<span class="fixture-winner-indicator" title="Winner">👑</span>' : ''}
+            ${isAwayWinner ? '<span class="fixture-winner-indicator" title="Winner">👑</span>' : ''}
+          `;
+        }
+
+        let dateInfo = '';
+        if (f.date || f.time) {
+          dateInfo = `📅 ${f.date || ''} ${f.time ? (f.date ? ' •  🕒 ' : '🕒 ') + f.time : ''}`;
+        }
+        let venueInfo = f.venue ? `📍 ${f.venue}` : '';
+
+        card.innerHTML = `
+          <div class="fixture-header">
+            <div class="fixture-info-left">
+              <div style="font-weight: 900; text-transform: uppercase; font-size: 15px; color: var(--primary); margin-bottom: 2px;">${f.name || 'Match'}</div>
+              ${dateInfo ? `<div class="fixture-date-time">${dateInfo}</div>` : ''}
+              ${venueInfo ? `<div class="fixture-venue">${venueInfo}</div>` : ''}
+            </div>
+            <span class="fixture-status-badge ${statusBadgeClass}">${statusText}</span>
+          </div>
+          <div class="fixture-teams-row">
+            <div class="fixture-team-block home">
+              <span class="fixture-team-name">${homeName}</span>
+              <div class="fixture-team-badge" style="background-color: ${homeColor}">
+                ${homeBadge}
+              </div>
+            </div>
+            <div class="fixture-vs-score-block">
+              ${scoreOrVsHtml}
+            </div>
+            <div class="fixture-team-block away">
+              <div class="fixture-team-badge" style="background-color: ${awayColor}">
+                ${awayBadge}
+              </div>
+              <span class="fixture-team-name">${awayName}</span>
+            </div>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    function renderAdminFixtures() {
+      const list = document.getElementById('admin-fixtures-list');
+      if (!list) return;
+      list.innerHTML = '';
+
+      const fixtures = tournamentData.fixtures || [];
+      if (fixtures.length === 0) {
+        list.innerHTML = `<div style="text-align:center; padding: 24px; color: var(--text-muted)">No matches scheduled yet. Use the form on the left!</div>`;
+        return;
+      }
+
+      const sorted = [...fixtures].sort((a, b) => {
+        const dateA = a.date || '9999-12-31';
+        const timeA = a.time || '23:59';
+        const dateB = b.date || '9999-12-31';
+        const timeB = b.time || '23:59';
+        const dateTimeA = new Date(`${dateA}T${timeA}`);
+        const dateTimeB = new Date(`${dateB}T${timeB}`);
+        return dateTimeA - dateTimeB;
+      });
+
+      sorted.forEach(f => {
+        const homeTeam = tournamentData.teams.find(t => t.id === f.homeTeamId);
+        const awayTeam = tournamentData.teams.find(t => t.id === f.awayTeamId);
+        const homeName = homeTeam ? homeTeam.name : 'Unknown';
+        const awayName = awayTeam ? awayTeam.name : 'Unknown';
+        
+        const item = document.createElement('div');
+        item.className = 'admin-fixture-list-item';
+        
+        let scoreString = 'VS';
+        if (f.status !== 'upcoming') {
+          scoreString = `${f.homeScore} - ${f.awayScore}`;
+        }
+        
+        let statusLabel = f.status === 'upcoming' ? 'Scheduled' : f.status === 'completed' ? 'Completed' : 'LIVE 🔴';
+
+        let infoStr = '';
+        if (f.date) infoStr += `📅 ${f.date}`;
+        if (f.time) infoStr += `${f.date ? ' @ ' : '🕒 '}${f.time}`;
+        if (f.venue) infoStr += `${infoStr ? ' • ' : ''}📍 ${f.venue}`;
+        if (!infoStr) infoStr = 'No schedule details set';
+
+        item.innerHTML = `
+          <div class="admin-fixture-top">
+            <span>${infoStr}</span>
+            <span style="text-transform: uppercase; font-weight: 800;">${statusLabel}</span>
+          </div>
+          <div class="admin-fixture-matchup">
+            <span style="font-weight: 900; color: var(--primary); font-size: 13px; text-transform: uppercase;">${f.name || 'Match'}</span>
+            <div style="display: flex; gap: 8px; align-items: center; font-size: 15px;">
+              <span>${homeName}</span>
+              <strong style="background: #000; color: #fff; padding: 2px 8px; border-radius: 4px; font-family: var(--font-mono);">${scoreString}</strong>
+              <span>${awayName}</span>
+            </div>
+          </div>
+          <div class="admin-fixture-actions">
+            <button type="button" class="action-btn action-btn-edit" onclick="initiateEditFixture(${f.id})">✏️ Edit</button>
+            <button type="button" class="action-btn action-btn-delete" onclick="deleteFixture(${f.id})">🗑️ Delete</button>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function handleFixtureFormSubmit(e) {
+      e.preventDefault();
+      const idField = document.getElementById('edit-fixture-id').value;
+      const name = document.getElementById('form-fixture-name').value.trim();
+      const homeTeamId = parseInt(document.getElementById('form-fixture-home').value);
+      const awayTeamId = parseInt(document.getElementById('form-fixture-away').value);
+      const date = document.getElementById('form-fixture-date').value;
+      const time = document.getElementById('form-fixture-time').value;
+      const venue = document.getElementById('form-fixture-venue').value.trim();
+      const status = document.getElementById('form-fixture-status').value;
+      
+      if (homeTeamId === awayTeamId) {
+        showToast("Team 1 and Team 2 must be different!", "❌");
+        return;
+      }
+
+      const homeScore = parseInt(document.getElementById('form-fixture-homescore').value) || 0;
+      const awayScore = parseInt(document.getElementById('form-fixture-awayscore').value) || 0;
+
+      if (idField !== "") {
+        // --- EDITING ENTRY ---
+        const fId = parseInt(idField);
+        const idx = tournamentData.fixtures.findIndex(f => f.id === fId);
+        if (idx !== -1) {
+          tournamentData.fixtures[idx] = {
+            id: fId,
+            name,
+            homeTeamId,
+            awayTeamId,
+            date,
+            time,
+            venue,
+            status,
+            homeScore,
+            awayScore
+          };
+          showToast("Saved fixture updates!");
+        }
+      } else {
+        // --- ADDING ENTRY ---
+        const nextId = tournamentData.fixtures.length > 0 
+          ? Math.max(...tournamentData.fixtures.map(f => f.id)) + 1 
+          : 1;
+        tournamentData.fixtures.push({
+          id: nextId,
+          name,
+          homeTeamId,
+          awayTeamId,
+          date,
+          time,
+          venue,
+          status,
+          homeScore,
+          awayScore
+        });
+        showToast("Scheduled new match!");
+      }
+
+      cancelFixtureEdit();
+      saveDatabase();
+      renderAllViews();
+    }
+
+    function initiateEditFixture(id) {
+      const f = tournamentData.fixtures.find(fixture => fixture.id === id);
+      if (!f) return;
+
+      populateFixtureTeamDropdowns();
+
+      document.getElementById('edit-fixture-id').value = f.id;
+      document.getElementById('form-fixture-name').value = f.name || '';
+      document.getElementById('form-fixture-home').value = f.homeTeamId;
+      document.getElementById('form-fixture-away').value = f.awayTeamId;
+      document.getElementById('form-fixture-date').value = f.date;
+      document.getElementById('form-fixture-time').value = f.time;
+      document.getElementById('form-fixture-venue').value = f.venue;
+      document.getElementById('form-fixture-status').value = f.status;
+      
+      document.getElementById('form-fixture-homescore').value = f.homeScore || 0;
+      document.getElementById('form-fixture-awayscore').value = f.awayScore || 0;
+
+      toggleFormFixtureScores();
+
+      document.getElementById('fixture-form-title').innerText = "Edit Match Schedule";
+      document.getElementById('fixture-submit-btn').innerText = "Save Match Changes";
+      document.getElementById('fixture-submit-btn').style.backgroundColor = "var(--success)";
+      document.getElementById('fixture-cancel-btn').style.display = "block";
+
+      document.getElementById('fixture-edit-form').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function cancelFixtureEdit() {
+      document.getElementById('edit-fixture-id').value = '';
+      document.getElementById('form-fixture-name').value = '';
+      document.getElementById('form-fixture-home').value = '';
+      document.getElementById('form-fixture-away').value = '';
+      document.getElementById('form-fixture-date').value = '';
+      document.getElementById('form-fixture-time').value = '';
+      document.getElementById('form-fixture-venue').value = '';
+      document.getElementById('form-fixture-status').value = 'upcoming';
+      
+      document.getElementById('form-fixture-homescore').value = '0';
+      document.getElementById('form-fixture-awayscore').value = '0';
+
+      toggleFormFixtureScores();
+
+      document.getElementById('fixture-form-title').innerText = "Schedule A Match";
+      document.getElementById('fixture-submit-btn').innerText = "Schedule Match";
+      document.getElementById('fixture-submit-btn').style.backgroundColor = "var(--admin)";
+      document.getElementById('fixture-cancel-btn').style.display = "none";
+    }
+
+    function deleteFixture(id) {
+      const idx = tournamentData.fixtures.findIndex(f => f.id === id);
+      if (idx === -1) return;
+
+      const f = tournamentData.fixtures[idx];
+      const homeTeam = tournamentData.teams.find(t => t.id === f.homeTeamId);
+      const awayTeam = tournamentData.teams.find(t => t.id === f.awayTeamId);
+      const label = `${homeTeam ? homeTeam.name : 'Unknown'} vs ${awayTeam ? awayTeam.name : 'Unknown'}`;
+
+      showCustomConfirm(`Do you want to delete the fixture for "${label}"?`, () => {
+        tournamentData.fixtures.splice(idx, 1);
+        showToast("Purged fixture entry.", "🗑️");
+
+        cancelFixtureEdit();
+        saveDatabase();
+        renderAllViews();
+      });
+    }
+
+    function toggleFormFixtureScores() {
+      const status = document.getElementById('form-fixture-status').value;
+      const wrap = document.getElementById('form-fixture-scores-wrap');
+      if (wrap) {
+        if (status === 'completed' || status === 'live') {
+          wrap.style.display = 'block';
+        } else {
+          wrap.style.display = 'none';
+        }
+      }
+    }
+
+    function setFixtureFilter(filter) {
+      activeFixtureFilter = filter;
+      const buttons = document.querySelectorAll('.fixture-filter-btn');
+      buttons.forEach(btn => {
+        btn.classList.remove('active');
+      });
+      const activeBtn = document.getElementById(`filter-fixture-${filter}`);
+      if (activeBtn) activeBtn.classList.add('active');
+      renderFixturesView();
+    }
+
+    function autoRecomputeStandingsFromFixtures() {
+      showCustomConfirm("Are you sure you want to overwrite all tournament standings statistics by auto-calculating them from completed fixtures?", () => {
+        tournamentData.standings.forEach(st => {
+          st.won = 0;
+          st.lost = 0;
+          st.drawn = 0;
+        });
+
+        const completed = (tournamentData.fixtures || []).filter(f => f.status === 'completed');
+        completed.forEach(f => {
+          let homeStand = tournamentData.standings.find(s => s.teamId === f.homeTeamId);
+          let awayStand = tournamentData.standings.find(s => s.teamId === f.awayTeamId);
+
+          if (!homeStand) {
+            homeStand = { teamId: f.homeTeamId, won: 0, lost: 0, drawn: 0 };
+            tournamentData.standings.push(homeStand);
+          }
+          if (!awayStand) {
+            awayStand = { teamId: f.awayTeamId, won: 0, lost: 0, drawn: 0 };
+            tournamentData.standings.push(awayStand);
+          }
+
+          if (f.homeScore > f.awayScore) {
+            homeStand.won += 1;
+            awayStand.lost += 1;
+          } else if (f.awayScore > f.homeScore) {
+            awayStand.won += 1;
+            homeStand.lost += 1;
+          } else {
+            homeStand.drawn += 1;
+            awayStand.drawn += 1;
+          }
+        });
+
+        showToast("Standings recomputed from completed fixtures!");
+        saveDatabase();
+        renderAllViews();
+      });
+    }
+  </script>
+</body>
+</html>

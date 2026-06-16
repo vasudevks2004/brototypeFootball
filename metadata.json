@@ -1,0 +1,6 @@
+{
+  "name": "District Football Tournament",
+  "description": "A complete website for the District Football Tournament with public standings, select-team lists, and a password-protected admin dashboard to modify data.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
