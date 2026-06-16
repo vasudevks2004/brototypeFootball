@@ -1,7 +1,47 @@
 {
-  "tournamentName": "Bro Tournament",
-  "teams": [],
-  "standings": [],
+  "teams": [
+    {
+      "id": 1,
+      "flag": "🇪🇸",
+      "name": "spain",
+      "color": "#dc2626",
+      "players": [
+        {
+          "name": "vasu",
+          "number": 1
+        },
+        {
+          "name": "henel",
+          "number": 2
+        },
+        {
+          "name": "Vasudev K S",
+          "number": 3
+        },
+        {
+          "name": "Rajesh",
+          "number": 4
+        },
+        {
+          "name": "nandu",
+          "number": 5
+        },
+        {
+          "name": "Aboobacker H M",
+          "number": 6
+        }
+      ]
+    }
+  ],
   "scorers": [],
-  "fixtures": []
+  "fixtures": [],
+  "standings": [
+    {
+      "won": 0,
+      "lost": 0,
+      "drawn": 0,
+      "teamId": 1
+    }
+  ],
+  "tournamentName": "Bro Tournament"
 }

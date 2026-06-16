@@ -13,7 +13,7 @@ async function startServer() {
 
   // Supabase central parameters
   const SUPABASE_URL = process.env.SUPABASE_URL || "https://vjtirydmavuknpruxutq.supabase.co";
-  const SUPABASE_KEY = process.env.SUPABASE_KEY || "sb_publishable_vI8Y4wnhM3AuOxkSh8Wjqw_Sf4vIdpn";
+  const SUPABASE_KEY = process.env.SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdGlyeWRtYXZ1a25wcnV4dXRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1NTk2MDMsImV4cCI6MjA5NzEzNTYwM30.r47gybToBIdfHWfrcmqpZVHMQdSR4IgAXhiG1gWG8QM";
 
   // Gracefully fetch from Supabase
   async function fetchSupabaseData(): Promise<any | null> {
@@ -28,11 +28,17 @@ async function startServer() {
         }
       });
 
+      console.log(`Supabase GET status: ${res.status}`);
+      
       if (res.status === 200 || res.status === 206) {
         const rows = (await res.json()) as any[];
+        console.log(`Supabase GET returned ${rows.length} row(s)`);
         if (rows && rows.length > 0 && rows[0].data) {
           return rows[0].data;
         }
+      } else {
+        const errBody = await res.text();
+        console.log(`Supabase GET error: ${errBody}`);
       }
     } catch (error) {
       console.error("Supabase load failed, using local database fallback:", error);
@@ -45,14 +51,14 @@ async function startServer() {
     try {
       const url = `${SUPABASE_URL}/rest/v1/tournament_store`;
       
-      // Try PostgREST Upsert using key column mapping
+      // Try PostgREST Upsert — correct header format for on_conflict
       const res = await fetch(url, {
         method: "POST",
         headers: {
           "apikey": SUPABASE_KEY,
           "Authorization": `Bearer ${SUPABASE_KEY}`,
           "Content-Type": "application/json",
-          "Prefer": "resolution=merge-duplicates,on-conflict=key"
+          "Prefer": "resolution=merge-duplicates"
         },
         body: JSON.stringify({ key: "default", data: data })
       });
@@ -62,15 +68,18 @@ async function startServer() {
         return true;
       }
 
-      // Fallback: If upsert failed, try direct PATCH
-      console.log(`Supabase UPSERT returned ${res.status}. Falling back to direct PATCH...`);
+      const errText = await res.text();
+      console.log(`Supabase UPSERT returned ${res.status}: ${errText}. Falling back to direct PATCH...`);
+      
+      // Fallback: Try direct PATCH
       const patchUrl = `${SUPABASE_URL}/rest/v1/tournament_store?key=eq.default`;
       const patchRes = await fetch(patchUrl, {
         method: "PATCH",
         headers: {
           "apikey": SUPABASE_KEY,
           "Authorization": `Bearer ${SUPABASE_KEY}`,
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Prefer": "return=minimal"
         },
         body: JSON.stringify({ data: data })
       });
@@ -80,14 +89,17 @@ async function startServer() {
         return true;
       }
 
-      // Try raw POST as insert
-      console.log(`Supabase PATCH returned ${patchRes.status}. Falling back to Insert...`);
+      const patchErr = await patchRes.text();
+      console.log(`Supabase PATCH returned ${patchRes.status}: ${patchErr}. Trying INSERT...`);
+      
+      // Try raw POST as insert (no upsert headers)
       const insertRes = await fetch(url, {
         method: "POST",
         headers: {
           "apikey": SUPABASE_KEY,
           "Authorization": `Bearer ${SUPABASE_KEY}`,
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Prefer": "return=minimal"
         },
         body: JSON.stringify({ key: "default", data: data })
       });
@@ -96,6 +108,9 @@ async function startServer() {
         console.log("Supabase tournament database standard insert succeeded.");
         return true;
       }
+      
+      const insertErr = await insertRes.text();
+      console.log(`Supabase INSERT returned ${insertRes.status}: ${insertErr}`);
     } catch (error) {
       console.error("Supabase write failed, falling back to local file persistence:", error);
     }
